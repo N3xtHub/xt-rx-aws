@@ -1,0 +1,130 @@
+plugins {
+    id "com.github.hierynomus.license" version "0.11.0"
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'maven'
+apply plugin: "jacoco"
+apply plugin: "com.github.hierynomus.license"
+
+group 'com.xtrac.xt-rx-aws'
+version = "${RX_AWS_VERSION}"
+configurations {
+    all*.exclude group: 'log4j'
+    all*.exclude group: 'xml-apis'
+    all*.exclude group: 'commons-logging'
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+dependencies {
+
+    compile 'io.projectreactor:reactor-bus:2.0.7.RELEASE'
+    compile "com.amazonaws:aws-java-sdk-kinesis:${AWS_SDK_VERSION}"
+    compile "com.amazonaws:aws-java-sdk-sqs:${AWS_SDK_VERSION}"
+    compile "com.amazonaws:aws-java-sdk-dynamodb:${AWS_SDK_VERSION}"
+    compile "com.amazonaws:aws-java-sdk-cloudwatch:${AWS_SDK_VERSION}"
+    compile "com.amazonaws:aws-java-sdk-sns:${AWS_SDK_VERSION}"
+    compile "com.amazonaws:aws-java-sdk-kms:${AWS_SDK_VERSION}"
+    compile "com.amazonaws:amazon-kinesis-client:${AWS_KINESIS_CLIENT_VERSION}"
+    compile 'io.reactivex:rxjava:1.1.3'
+    compile 'io.reactivex:rxjava-reactive-streams:1.0.1'
+    compile "org.slf4j:jcl-over-slf4j:1.7.21"
+ 
+    testCompile 'org.assertj:assertj-core:3.4.1'
+    testCompile "junit:junit:4.12"
+    testCompile 'ch.qos.logback:logback-classic:1.1.7'
+
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.12'
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+	
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+test {
+    testLogging {
+        events "failed"
+        exceptionFormat "short"
+        showStandardStreams = true
+    }
+}
+artifacts {
+    archives sourcesJar, javadocJar
+}
+uploadArchives {
+    repositories {
+        mavenDeployer {
+
+            name = 'sethdford-bintray'
+            if (!project.has('BINRAY_USER')) {
+                project.ext['BINTRAY_USER']=System.getenv("BINTRAY_USER")
+            }
+            if (!project.has('BINTRAY_KEY')) {
+                project.ext['BINTRAY_KEY'] = System.getenv("BINTRAY_KEY")
+            }
+
+
+            repository(id: 'sethdford-bintray', url: 'https://api.bintray.com/maven/sethdford/maven/xt-rx-aws'){
+                authentication(userName: BINTRAY_USER, password: BINTRAY_KEY)
+            }
+            pom.project {
+
+                name 'xt-rx-aws'
+                description 'Reactive Extensions for AWS'
+                packaging 'jar'
+                url 'https://github.com/xtraclabs/xt-rx-aws'
+                licenses {
+                    license {
+                        name 'The Apache Software License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        distribution 'repo'
+                    }
+                }
+                scm {
+                    connection 'scm:git:git@github.com:xtraclabs/xt-rx-aws.git'
+                    developerConnection 'scm:git:git@github.com:xtraclabs/xt-rx-aws.git'
+                    url 'git@github.com:LendingClub/rx-aws.git'
+                }
+                developers {
+                    developer {
+                        name 'Seth Ford'
+                        email 'seth.ford@gmail.com'
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+
+jacocoTestReport {
+    group = "reporting"
+    description = "Generate Jacoco coverage reports after running tests."
+    reports {
+        xml.enabled true
+        html.enabled true
+        csv.enabled false
+    }
+    //classDirectories = fileTree(dir: 'build/classes/main', include: 'com/thc/**')
+    //sourceDirectories = fileTree(dir: 'scr/java', include: 'com/thc/**')
+    additionalSourceDirs = files(sourceSets.main.allJava.srcDirs)
+}
+
+
