@@ -19,6 +19,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 
+import com.amazonaws.ClientConfiguration;
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
@@ -62,11 +63,13 @@ public class SQSReactorBridgeTest {
 
 	@Test
 	public void testBuilderSuccess() {
-
+		ClientConfiguration clientConfiguration = new ClientConfiguration();
+		 
 		SQSReactorBridge bridge = new SQSReactorBridge.Builder()
 				.withRegion("us-west-1")
 				.withEventBus(bus)
 				.withUrl("https://api.example.com")
+				.withClientConfiguration(clientConfiguration)
 				.build();
 		Assertions.assertThat(bridge).isNotNull();
 		Assertions.assertThat(bridge.getFailureCount().get()).isEqualTo(0);
