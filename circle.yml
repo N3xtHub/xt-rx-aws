@@ -23,6 +23,6 @@ test:
         
 deployment:
     bintray:
-        branch: bintray
+        branch: master
         commands:
             - ./gradlew bintrayUpload 
