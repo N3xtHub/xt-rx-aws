@@ -62,44 +62,42 @@ import reactor.bus.EventBus;
 import reactor.bus.selector.Selectors;
 
 public class SNSTest {
-	
+
 	static Logger log = LoggerFactory.getLogger(SNSTest.class);
-	
+
 	private static Properties readConfig() throws FileNotFoundException, IOException {
-        String propFilePath = System.getenv("CONFIG_PATH");
-        
-        log.info("config path: " + propFilePath);
-        System.err.println("prop file path is " + propFilePath);
-        if(propFilePath == null) {
-            throw new RuntimeException("CONFIG_PATH environment variable not set - cannot read configuration properties");
-        }
+		String propFilePath = System.getenv("CONFIG_PATH");
 
-        File file = new File(propFilePath);
-        FileInputStream fileInput = new FileInputStream(file);
-        Properties properties = new Properties();
-        properties.load(fileInput);
-        fileInput.close();
+		log.info("config path: " + propFilePath);
+		System.err.println("prop file path is " + propFilePath);
+		if (propFilePath == null) {
+			throw new RuntimeException(
+					"CONFIG_PATH environment variable not set - cannot read configuration properties");
+		}
 
-        return properties;
-    }
-	
-	public static final void main(String [] args) throws InterruptedException  {
-		
+		File file = new File(propFilePath);
+		FileInputStream fileInput = new FileInputStream(file);
+		Properties properties = new Properties();
+		properties.load(fileInput);
+		fileInput.close();
+
+		return properties;
+	}
+
+	public static final void main(String[] args) throws InterruptedException {
+
 		EventBus bus = EventBus.create(Environment.initializeIfEmpty());
-		String message = "{\n" + 
-				"  \"Type\" : \"Notification\",\n" + 
-				"  \"MessageId\" : \"abc2b453-349a-5637-b17c-fbc4aa639b6c\",\n" + 
-				"  \"TopicArn\" : \"arn:aws:sns:us-east-1:550588888888:test\",\n" + 
-				"  \"Subject\" : \"world\",\n" + 
-				"  \"Message\" : \"hello\",\n" + 
-				"  \"Timestamp\" : \"2016-04-25T04:27:37.504Z\",\n" + 
-				"  \"SignatureVersion\" : \"1\",\n" + 
-				"  \"Signature\" : \"SIGDATASIGDATA3Jee8fReP4hdnirjTyRy6TDk7lewTApqLnff882FCQMeDjr8XF3q4oHRcDCOYyy2eOHOafBJnSCPs0DgSJ3A3cNl9OeLeq4INg==\",\n" + 
-				"  \"SigningCertURL\" : \"https://sns.us-east-1.amazonaws.com/SimpleNotificationService-bb750dd426d95ee93901aaaaaaaaaaaa.pem\",\n" + 
-				"  \"UnsubscribeURL\" : \"https://sns.us-east-1.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:us-east-1:550534291128:test:d969ed7a-aaaa-aaaa-aaaa-aaaaaaaaaaaa\"\n" + 
-				"}";
+		String message = "{\n" + "  \"Type\" : \"Notification\",\n"
+				+ "  \"MessageId\" : \"abc2b453-349a-5637-b17c-fbc4aa639b6c\",\n"
+				+ "  \"TopicArn\" : \"arn:aws:sns:us-east-1:550588888888:test\",\n" + "  \"Subject\" : \"world\",\n"
+				+ "  \"Message\" : \"hello\",\n" + "  \"Timestamp\" : \"2016-04-25T04:27:37.504Z\",\n"
+				+ "  \"SignatureVersion\" : \"1\",\n"
+				+ "  \"Signature\" : \"SIGDATASIGDATA3Jee8fReP4hdnirjTyRy6TDk7lewTApqLnff882FCQMeDjr8XF3q4oHRcDCOYyy2eOHOafBJnSCPs0DgSJ3A3cNl9OeLeq4INg==\",\n"
+				+ "  \"SigningCertURL\" : \"https://sns.us-east-1.amazonaws.com/SimpleNotificationService-bb750dd426d95ee93901aaaaaaaaaaaa.pem\",\n"
+				+ "  \"UnsubscribeURL\" : \"https://sns.us-east-1.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:us-east-1:550534291128:test:d969ed7a-aaaa-aaaa-aaaa-aaaaaaaaaaaa\"\n"
+				+ "}";
 		DefaultAWSCredentialsProviderChain chain = new DefaultAWSCredentialsProviderChain();
-		
+
 		Properties configProps = null;
 		try {
 			configProps = readConfig();
@@ -111,77 +109,62 @@ public class SNSTest {
 			e.printStackTrace();
 		}
 		Config config = new Config(configProps);
-		
-		 ClientConfiguration clientConfiguration = new ClientConfiguration();
-	        clientConfiguration.setProxyHost(config.getProxyHost());
-	        clientConfiguration.setProxyPort(config.getProxyPort());
-	        
-	   
-	        
-	     
-		Regions region = Regions.fromName(config.getRegionName() );    	 
-		 
-		 
+
+		ClientConfiguration clientConfiguration = new ClientConfiguration();
+		if (config.getProxyHost() != null && config.getProxyHost() != "") {
+			clientConfiguration.setProxyHost(config.getProxyHost());
+			clientConfiguration.setProxyPort(config.getProxyPort());
+		}
+
+		Regions region = Regions.fromName(config.getRegionName());
+
 		AmazonSNSAsyncClient sns = new AmazonSNSAsyncClient(clientConfiguration);
-		sns.setRegion(Region.getRegion( region));
+		sns.setRegion(Region.getRegion(region));
 		CreateTopicRequest createTopicRequest = new CreateTopicRequest("test");
 		CreateTopicResult createResult = sns.createTopic(createTopicRequest);
 		String snsArn = createResult.getTopicArn();
-		
+
 		AmazonSQSAsyncClient client = new AmazonSQSAsyncClient(clientConfiguration);
-		client.setRegion(Region.getRegion( region));
+		client.setRegion(Region.getRegion(region));
 		CreateQueueRequest request = new CreateQueueRequest("test");
 		CreateQueueResult result = client.createQueue(request);
 		String sqsName = result.getQueueUrl();
-		
 
 		GetQueueAttributesRequest queueAttributesRequest = new GetQueueAttributesRequest(sqsName)
-		 .withAttributeNames("All");
+				.withAttributeNames("All");
 		GetQueueAttributesResult queueAttributesResult = client.getQueueAttributes(queueAttributesRequest);
 		Map<String, String> sqsAttributeMap = queueAttributesResult.getAttributes();
-		String sqsArn = sqsAttributeMap.get("QueueArn"); 
+		String sqsArn = sqsAttributeMap.get("QueueArn");
 
 		SubscribeRequest subscribeRequest = new SubscribeRequest(snsArn, "sqs", sqsArn);
 		SubscribeResult subscribeResult = sns.subscribe(subscribeRequest);
 		String subscriptionArn = subscribeResult.getSubscriptionArn();
-		
-		Statement statement = new Statement(Effect.Allow)
-				 .withActions(SQSActions.SendMessage)
-				 .withPrincipals(new Principal("*"))
-				 .withConditions(ConditionFactory.newSourceArnCondition(snsArn))
-				 .withResources(new Resource(sqsArn));
-				Policy policy = new Policy("SubscriptionPermission")
-				 .withStatements(statement);
-		
+
+		Statement statement = new Statement(Effect.Allow).withActions(SQSActions.SendMessage)
+				.withPrincipals(new Principal("*")).withConditions(ConditionFactory.newSourceArnCondition(snsArn))
+				.withResources(new Resource(sqsArn));
+		Policy policy = new Policy("SubscriptionPermission").withStatements(statement);
+
 		HashMap<String, String> attributes = new HashMap<String, String>();
 		attributes.put("Policy", policy.toJson());
 		SetQueueAttributesRequest req = new SetQueueAttributesRequest(sqsName, attributes);
 		client.setQueueAttributes(req);
 
+		SQSReactorBridge bridge = new SQSReactorBridge.Builder().withSNSSupport(true).withEventBus(bus)
+				.withSQSClient(client).withUrl(sqsName).withRegion(config.getRegionName())
+				.withClientConfiguration(clientConfiguration).build().start();
 
-		SQSReactorBridge bridge = new SQSReactorBridge.Builder()
-				.withSNSSupport(true)
-				.withEventBus(bus)
-				.withSQSClient(client)
-				.withUrl(sqsName)
-				.withRegion(config.getRegionName())
-				.withClientConfiguration(clientConfiguration)
-				.build()
-				.start();
-		 
-		
-		bus.on(SNSSelectors.snsTopicSelector("test"), (Event<SNSMessage> c)-> {
-			log.info(">> "+c.getData().getSubject());
+		bus.on(SNSSelectors.snsTopicSelector("test"), (Event<SNSMessage> c) -> {
+			log.info(">> " + c.getData().getSubject());
 			log.info(c.getData().getTopicArn());
 			log.info(c.getData().getBodyAsJson().toString());
 		});
-		
-		
-		sns.publish("arn:aws:sns:us-east-1:132368745812:test", "{\"workItem\":{\"fileNumber\":\"W026938-02AUG16\",\"orgId\":1021,\"itemType\":\"Project Request\",\"status\":\"APRQ\",\"statusType\":\"P\",\"statusDate\":\"2016-08-02T18:47:23-0500\",\"suspenseStatus\":\"A\",\"splitStatus\":\"N\",\"memo\":\" \",\"amount\":0,\"currentQueue\":\"A045103\",\"currentNode\":\"Management\",\"nodeAccessGroup\":\"Management\",\"creatingOperator\":\"A045103\",\"nodeWhereCreated\":\"Management\",\"createDate\":\"2016-08-02T18:47:23-0500\",\"lastEvent\":\"ENTER\",\"lastEventDate\":\"2016-08-02T18:47:23-0500\",\"priorityNumber\":0,\"suspensionCount\":0,\"suspensionDuration\":0,\"queueType\":1,\"queueEnterTime\":\"2016-08-02T18:47:23-0500\",\"parentFileNumber\":0,\"nonCntrSuspensionCount\":0,\"nonCntrSuspensionDuration\":0,\"familyId\":26938080216,\"modOperId\":\"A045103\",\"noteCount\":0,\"parties\":[{\"partyNumber\":1,\"name\":\"ORIG\",\"taxReportingCode\":\" \",\"organizationName\":\"ACME\",\"accountNumber\":\"111\"}]},\"eventDetail\":{\"name\":\"CREATE_EVENT\",\"id\":142914,\"timestamp\":\"2016-08-02T18:47:23-0500\"}}", "XT-Event");
-		//log.info(topicArn);
-		
-		
-	
+
+		sns.publish("arn:aws:sns:us-east-1:132368745812:test",
+				"{\"workItem\":{\"fileNumber\":\"W026938-02AUG16\",\"orgId\":1021,\"itemType\":\"Project Request\",\"status\":\"APRQ\",\"statusType\":\"P\",\"statusDate\":\"2016-08-02T18:47:23-0500\",\"suspenseStatus\":\"A\",\"splitStatus\":\"N\",\"memo\":\" \",\"amount\":0,\"currentQueue\":\"A045103\",\"currentNode\":\"Management\",\"nodeAccessGroup\":\"Management\",\"creatingOperator\":\"A045103\",\"nodeWhereCreated\":\"Management\",\"createDate\":\"2016-08-02T18:47:23-0500\",\"lastEvent\":\"ENTER\",\"lastEventDate\":\"2016-08-02T18:47:23-0500\",\"priorityNumber\":0,\"suspensionCount\":0,\"suspensionDuration\":0,\"queueType\":1,\"queueEnterTime\":\"2016-08-02T18:47:23-0500\",\"parentFileNumber\":0,\"nonCntrSuspensionCount\":0,\"nonCntrSuspensionDuration\":0,\"familyId\":26938080216,\"modOperId\":\"A045103\",\"noteCount\":0,\"parties\":[{\"partyNumber\":1,\"name\":\"ORIG\",\"taxReportingCode\":\" \",\"organizationName\":\"ACME\",\"accountNumber\":\"111\"}]},\"eventDetail\":{\"name\":\"CREATE_EVENT\",\"id\":142914,\"timestamp\":\"2016-08-02T18:47:23-0500\"}}",
+				"XT-Event");
+		// log.info(topicArn);
+
 		Thread.sleep(30000L);
 	}
 }

@@ -135,9 +135,10 @@ public abstract class AbstractSQSIntegrationTest {
 			}
 
 			ClientConfiguration clientConfiguration = new ClientConfiguration();
-			clientConfiguration.setProxyHost(config.getProxyHost());
-			clientConfiguration.setProxyPort(config.getProxyPort());
-
+			if (config.getProxyHost() != null && config.getProxyHost()!= ""){
+				clientConfiguration.setProxyHost(config.getProxyHost());
+				clientConfiguration.setProxyPort(config.getProxyPort());
+			}
 			Regions region = Regions.fromName(config.getRegionName());
 
 			client = new AmazonSQSAsyncClient(clientConfiguration);

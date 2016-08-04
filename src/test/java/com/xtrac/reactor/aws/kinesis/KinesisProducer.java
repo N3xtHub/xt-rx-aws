@@ -41,10 +41,13 @@ public class KinesisProducer {
 		Properties configProps = readConfig();
 		Config config = new Config(configProps);
 		
-		 ClientConfiguration clientConfiguration = new ClientConfiguration();
-	        clientConfiguration.setProxyHost(config.getProxyHost());
-	        clientConfiguration.setProxyPort(config.getProxyPort());
-	        
+		ClientConfiguration clientConfiguration = new ClientConfiguration();
+		
+		if (config.getProxyHost() != null && config.getProxyHost()!= ""){
+			clientConfiguration.setProxyHost(config.getProxyHost());
+			clientConfiguration.setProxyPort(config.getProxyPort());
+		}
+		
 	    AmazonKinesisClient client = new AmazonKinesisClient(clientConfiguration);
 	    Regions region = Regions.fromName(config.getRegionName() );    	 
 		client.setRegion(Region.getRegion( region));

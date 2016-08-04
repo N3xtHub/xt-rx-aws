@@ -68,9 +68,12 @@ public abstract class AbstractKinesisIntegrationTest {
 			
 			
 			ClientConfiguration clientConfiguration = new ClientConfiguration();
-	        clientConfiguration.setProxyHost(config.getProxyHost());
-	        clientConfiguration.setProxyPort(config.getProxyPort());
-	        
+			
+			if (config.getProxyHost() != null && config.getProxyHost()!= ""){
+				clientConfiguration.setProxyHost(config.getProxyHost());
+				clientConfiguration.setProxyPort(config.getProxyPort());
+			}
+			
 		    kinesisClient = new AmazonKinesisAsyncClient(clientConfiguration);
 		    Regions region = Regions.fromName(config.getRegionName() );    	 
 		    kinesisClient.setRegion(Region.getRegion( region));
@@ -84,7 +87,6 @@ public abstract class AbstractKinesisIntegrationTest {
         String propFilePath = System.getenv("CONFIG_PATH");
         
         log.info("config path: " + propFilePath);
-        System.err.println("prop file path is " + propFilePath);
         if(propFilePath == null) {
             throw new RuntimeException("CONFIG_PATH environment variable not set - cannot read configuration properties");
         }

@@ -35,30 +35,31 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 public class SQSReactorBridgeIntegrationTest extends AbstractSQSIntegrationTest {
-	
+
 	private static Properties readConfig() throws FileNotFoundException, IOException {
-        String propFilePath = System.getenv("CONFIG_PATH");
-        
-        log.info("config path: " + propFilePath);
-        System.err.println("prop file path is " + propFilePath);
-        if(propFilePath == null) {
-            throw new RuntimeException("CONFIG_PATH environment variable not set - cannot read configuration properties");
-        }
+		String propFilePath = System.getenv("CONFIG_PATH");
 
-        File file = new File(propFilePath);
-        FileInputStream fileInput = new FileInputStream(file);
-        Properties properties = new Properties();
-        properties.load(fileInput);
-        fileInput.close();
+		log.info("config path: " + propFilePath);
+		System.err.println("prop file path is " + propFilePath);
+		if (propFilePath == null) {
+			throw new RuntimeException(
+					"CONFIG_PATH environment variable not set - cannot read configuration properties");
+		}
 
-        return properties;
-    }
-	
-    @Test
-    public void testIt() throws InterruptedException {
-        emptyQueue();
-        
-        Properties configProps = null;
+		File file = new File(propFilePath);
+		FileInputStream fileInput = new FileInputStream(file);
+		Properties properties = new Properties();
+		properties.load(fileInput);
+		fileInput.close();
+
+		return properties;
+	}
+
+	@Test
+	public void testIt() throws InterruptedException {
+		emptyQueue();
+
+		Properties configProps = null;
 		try {
 			configProps = readConfig();
 		} catch (FileNotFoundException e) {
@@ -69,48 +70,45 @@ public class SQSReactorBridgeIntegrationTest extends AbstractSQSIntegrationTest 
 			e.printStackTrace();
 		}
 		Config config = new Config(configProps);
+
+		ClientConfiguration clientConfiguration = new ClientConfiguration();
+		if (config.getProxyHost() != null && config.getProxyHost() != "") {
+			clientConfiguration.setProxyHost(config.getProxyHost());
+			clientConfiguration.setProxyPort(config.getProxyPort());
+		}
 		
-		 ClientConfiguration clientConfiguration = new ClientConfiguration();
-	        clientConfiguration.setProxyHost(config.getProxyHost());
-	        clientConfiguration.setProxyPort(config.getProxyPort());
-	        
-        SQSReactorBridge b = new SQSReactorBridge.Builder()
-                .withSQSClient(getSQSClient())
-                .withEventBus(getEventBus())
-                .withUrl(getQueueUrl())
-                .withClientConfiguration(clientConfiguration)
-                .withRegion(config.getRegionName())
-                .build()
-                .start();
+		SQSReactorBridge b = new SQSReactorBridge.Builder().withSQSClient(getSQSClient()).withEventBus(getEventBus())
+				.withUrl(getQueueUrl()).withClientConfiguration(clientConfiguration).withRegion(config.getRegionName())
+				.build().start();
 
-        Assertions.assertThat(b.getQueueArn()).startsWith("arn:aws:sqs:");
-        CountDownLatch latch = new CountDownLatch(3);
-        List<Event<SQSMessage>> list = Lists.newCopyOnWriteArrayList();
+		Assertions.assertThat(b.getQueueArn()).startsWith("arn:aws:sqs:");
+		CountDownLatch latch = new CountDownLatch(3);
+		List<Event<SQSMessage>> list = Lists.newCopyOnWriteArrayList();
 
-        bus.on(Selectors.T(SQSMessage.class), (Event<SQSMessage> evt) -> {
-            log.info("Received: {}", evt);
-            list.add(evt);
-            latch.countDown();
+		bus.on(Selectors.T(SQSMessage.class), (Event<SQSMessage> evt) -> {
+			log.info("Received: {}", evt);
+			list.add(evt);
+			latch.countDown();
 
-        });
+		});
 
-        getSQSClient().sendMessage(getQueueUrl(), "test1");
-        getSQSClient().sendMessage(getQueueUrl(), "test2");
-        getSQSClient().sendMessage(getQueueUrl(), "test3");
-        Assertions.assertThat(latch.await(20, TimeUnit.SECONDS)).isTrue();
-        log.info("received all: {}", list.size());
-        list.forEach(evt -> {
+		getSQSClient().sendMessage(getQueueUrl(), "test1");
+		getSQSClient().sendMessage(getQueueUrl(), "test2");
+		getSQSClient().sendMessage(getQueueUrl(), "test3");
+		Assertions.assertThat(latch.await(20, TimeUnit.SECONDS)).isTrue();
+		log.info("received all: {}", list.size());
+		list.forEach(evt -> {
 
-            SQSMessage msg = evt.getData();
-            Assertions.assertThat(msg).isNotNull();
-            Assertions.assertThat(msg.getUrl()).isEqualTo(b.getQueueUrl());
-            Assertions.assertThat(msg.getBridge()).isSameAs(b);
-            Assertions.assertThat(msg.getArn()).isEqualTo(b.getQueueArn());
+			SQSMessage msg = evt.getData();
+			Assertions.assertThat(msg).isNotNull();
+			Assertions.assertThat(msg.getUrl()).isEqualTo(b.getQueueUrl());
+			Assertions.assertThat(msg.getBridge()).isSameAs(b);
+			Assertions.assertThat(msg.getArn()).isEqualTo(b.getQueueArn());
 
-            Message sm = msg.getMessage();
+			Message sm = msg.getMessage();
 
-            Assertions.assertThat(sm).isNotNull();
-            Assertions.assertThat(sm.getAttributes()).hasSize(0);
-        });
-    }
+			Assertions.assertThat(sm).isNotNull();
+			Assertions.assertThat(sm.getAttributes()).hasSize(0);
+		});
+	}
 }

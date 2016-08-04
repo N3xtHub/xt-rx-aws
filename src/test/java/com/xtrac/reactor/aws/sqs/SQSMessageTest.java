@@ -41,13 +41,13 @@ import reactor.bus.registry.Registration;
 import reactor.bus.selector.Selectors;
 
 public class SQSMessageTest {
-	
+
 	static Logger log = LoggerFactory.getLogger(SQSMessageTest.class);
-	
+
 	@Test
 	public void testIt() throws InterruptedException {
 		Message m = new Message();
-		
+
 		Properties configProps = null;
 		try {
 			configProps = readConfig();
@@ -59,24 +59,21 @@ public class SQSMessageTest {
 			e.printStackTrace();
 		}
 		Config config = new Config(configProps);
-		
-		 ClientConfiguration clientConfiguration = new ClientConfiguration();
-	        clientConfiguration.setProxyHost(config.getProxyHost());
-	        clientConfiguration.setProxyPort(config.getProxyPort());
-	        
-	   
-		EventBus b = EventBus.create(Environment.initializeIfEmpty());
-		SQSReactorBridge bridge = new SQSReactorBridge.Builder()
-				.withRegion(config.getRegionName())
-				.withUrl("https://api.example.com")
-				.withEventBus(b)
-				.build();
 
-		SQSMessage msg = new SQSMessage(bridge,m);
+		ClientConfiguration clientConfiguration = new ClientConfiguration();
+		if (config.getProxyHost() != null && config.getProxyHost() != "") {
+			clientConfiguration.setProxyHost(config.getProxyHost());
+			clientConfiguration.setProxyPort(config.getProxyPort());
+		}
+
+		EventBus b = EventBus.create(Environment.initializeIfEmpty());
+		SQSReactorBridge bridge = new SQSReactorBridge.Builder().withRegion(config.getRegionName())
+				.withUrl("https://api.example.com").withEventBus(b).build();
+
+		SQSMessage msg = new SQSMessage(bridge, m);
 
 		Assertions.assertThat(msg.getMessage()).isSameAs(m);
-	
-	
+
 		Event<SQSMessage> em = Event.wrap(msg);
 
 		Assertions.assertThat(em.getData()).isNotNull();
@@ -91,22 +88,23 @@ public class SQSMessageTest {
 		latch.await();
 
 	}
-	
+
 	private static Properties readConfig() throws FileNotFoundException, IOException {
-        String propFilePath = System.getenv("CONFIG_PATH");
-        
-        log.info("config path: " + propFilePath);
-        System.err.println("prop file path is " + propFilePath);
-        if(propFilePath == null) {
-            throw new RuntimeException("CONFIG_PATH environment variable not set - cannot read configuration properties");
-        }
+		String propFilePath = System.getenv("CONFIG_PATH");
 
-        File file = new File(propFilePath);
-        FileInputStream fileInput = new FileInputStream(file);
-        Properties properties = new Properties();
-        properties.load(fileInput);
-        fileInput.close();
+		log.info("config path: " + propFilePath);
+		System.err.println("prop file path is " + propFilePath);
+		if (propFilePath == null) {
+			throw new RuntimeException(
+					"CONFIG_PATH environment variable not set - cannot read configuration properties");
+		}
 
-        return properties;
-    }
+		File file = new File(propFilePath);
+		FileInputStream fileInput = new FileInputStream(file);
+		Properties properties = new Properties();
+		properties.load(fileInput);
+		fileInput.close();
+
+		return properties;
+	}
 }
