@@ -29,6 +29,9 @@ import com.amazonaws.ClientConfiguration;
 import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.kinesis.AmazonKinesisClient;
+import com.amazonaws.services.sqs.AmazonSQSAsyncClient;
+import com.amazonaws.services.sqs.model.CreateQueueRequest;
+import com.amazonaws.services.sqs.model.CreateQueueResult;
 import com.amazonaws.services.sqs.model.Message;
 import com.xtrac.Config;
 import com.xtrac.reactor.aws.sqs.SQSMessage;
@@ -64,12 +67,29 @@ public class SQSMessageTest {
 		if (config.getProxyHost() != null && ! config.getProxyHost().equals("")) {
 			clientConfiguration.setProxyHost(config.getProxyHost());
 			clientConfiguration.setProxyPort(config.getProxyPort());
+			 
 		}
+		
+		
+		
+		AmazonSQSAsyncClient client = new AmazonSQSAsyncClient(clientConfiguration);
+		Regions region = Regions.fromName(config.getRegionName());
 
+		client.setRegion(Region.getRegion(region));
+		CreateQueueRequest request = new CreateQueueRequest("test");
+		CreateQueueResult result = client.createQueue(request);
+		String sqsName = result.getQueueUrl();
+		
 		EventBus b = EventBus.create(Environment.initializeIfEmpty());
-		SQSReactorBridge bridge = new SQSReactorBridge.Builder().withRegion(config.getRegionName())
-				.withUrl("https://api.example.com").withEventBus(b).build();
-
+		SQSReactorBridge bridge = null;
+		try{
+			
+			bridge = new SQSReactorBridge.Builder().withRegion(config.getRegionName())
+				.withUrl(sqsName).withEventBus(b).withClientConfiguration(clientConfiguration).build();
+		
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
 		SQSMessage msg = new SQSMessage(bridge, m);
 
 		Assertions.assertThat(msg.getMessage()).isSameAs(m);
