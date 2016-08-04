@@ -25,4 +25,4 @@ deployment:
     bintray:
         branch: bintray
         commands:
-            - ./gradlew uploadArchives
+            - ./gradlew bintrayUpload 
