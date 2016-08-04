@@ -308,9 +308,10 @@ public class KinesisReactorBridge extends AbstractReactorBridge {
             
             
             ClientConfiguration clientConfiguration = new ClientConfiguration();
-	        clientConfiguration.setProxyHost(config.getProxyHost());
-	        clientConfiguration.setProxyPort(config.getProxyPort());
-	         
+            if (!config.getProxyHost().equals("")) {
+		        clientConfiguration.setProxyHost(config.getProxyHost());
+		        clientConfiguration.setProxyPort(config.getProxyPort());
+            }
             bridge.kinesisConfig = kinesisConfig;
             kinesisConfig.withCommonClientConfig(clientConfiguration);
             kinesisConfig.withDynamoDBClientConfig(clientConfiguration);
