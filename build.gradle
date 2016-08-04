@@ -1,13 +1,15 @@
 plugins {
     id "com.github.hierynomus.license" version "0.11.0"
+    id "com.jfrog.bintray" version "1.7"
 }
-
+ 
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'maven'
+apply plugin: 'maven-publish'
 apply plugin: "jacoco"
 apply plugin: "com.github.hierynomus.license"
-
+ 
 group 'com.xtrac.xt-rx-aws'
 version = "${RX_AWS_VERSION}"
 configurations {
@@ -19,6 +21,7 @@ configurations {
 repositories {
     mavenLocal()
     mavenCentral()
+    jcenter()
 }
 
 sourceCompatibility = 1.8
@@ -67,52 +70,39 @@ test {
 artifacts {
     archives sourcesJar, javadocJar
 }
-uploadArchives {
-    repositories {
-        mavenDeployer {
-
-            name = 'sethdford-bintray'
-            if (!project.has('BINRAY_USER')) {
-                project.ext['BINTRAY_USER']=System.getenv("BINTRAY_USER")
-            }
-            if (!project.has('BINTRAY_KEY')) {
-                project.ext['BINTRAY_KEY'] = System.getenv("BINTRAY_KEY")
-            }
-
-
-            repository(id: 'sethdford-bintray', url: 'https://api.bintray.com/maven/sethdford/maven/xt-rx-aws'){
-                authentication(userName: BINTRAY_USER, password: BINTRAY_KEY)
-            }
-            pom.project {
-
-                name 'xt-rx-aws'
-                description 'Reactive Extensions for AWS'
-                packaging 'jar'
-                url 'https://github.com/xtraclabs/xt-rx-aws'
-                licenses {
-                    license {
-                        name 'The Apache Software License, Version 2.0'
-                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                        distribution 'repo'
-                    }
-                }
-                scm {
-                    connection 'scm:git:git@github.com:xtraclabs/xt-rx-aws.git'
-                    developerConnection 'scm:git:git@github.com:xtraclabs/xt-rx-aws.git'
-                    url 'git@github.com:LendingClub/rx-aws.git'
-                }
-                developers {
-                    developer {
-                        name 'Seth Ford'
-                        email 'seth.ford@gmail.com'
-                    }
-                }
-            }
-        }
-    }
+ 
+publishing {
+	publications {
+		MyPublication(MavenPublication) {
+			from components.java
+			groupId 'com.xtrac'
+            		artifactId 'com.xtrac.xt-rx-aws'
+            		version "${RX_AWS_VERSION}"
+		}
+	}
 }
 
-
+bintray {
+	user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
+	key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_API_KEY')
+	publications = ['MyPublication']
+	pkg {
+		repo = 'generic'
+		name = 'com.xtrac.xt-rx-aws'
+		userOrg = user
+		licenses = ['Apache-2.0']
+		vcsUrl = 'https://github.com/xtraclabs/xt-rx-aws.git'
+		labels = ['rx-aws']
+		publicDownloadNumbers = true
+		attributes= ['a': ['ay1', 'ay2'], 'b': ['bee'], c: 'cee'] //Optional package-level attributes
+		version {
+			name = '1.0-Final'
+			desc = 'Gradle Bintray Plugin 1.0 final'
+			vcsTag = "${RX_AWS_VERSION}"
+			attributes = ['gradle-plugin': 'com.use.less:com.use.less.gradle:gradle-useless-plugin']
+		}
+	}
+}
 
 jacocoTestReport {
     group = "reporting"
