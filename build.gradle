@@ -93,14 +93,14 @@ bintray {
 	key = System.getenv('BINTRAY_KEY')
 	publications = ['MyPublication']
 	pkg {
-		repo = 'generic'
+		repo = 'maven'
 		name = 'com.xtrac.xt-rx-aws'
-		userOrg = user
+		userOrg = xtraclabs
 		licenses = ['Apache-2.0']
 		vcsUrl = 'https://github.com/xtraclabs/xt-rx-aws.git'
 		labels = ['rx-aws']
 		publicDownloadNumbers = true
-		attributes= ['a': ['ay1', 'ay2'], 'b': ['bee'], c: 'cee'] //Optional package-level attributes
+		//attributes= ['a': ['ay1', 'ay2'], 'b': ['bee'], c: 'cee'] //Optional package-level attributes
 		version {
 			name = '1.0-Final'
 			desc = 'Gradle Bintray Plugin 1.0 final'
