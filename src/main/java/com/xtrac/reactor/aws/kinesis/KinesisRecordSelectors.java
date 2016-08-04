@@ -23,29 +23,29 @@ import reactor.bus.selector.Selectors;
 
 public class KinesisRecordSelectors {
 
-    private static final Logger logger = LoggerFactory.getLogger(KinesisRecordSelectors.class);
+	private static final Logger logger = LoggerFactory.getLogger(KinesisRecordSelectors.class);
 
-    public static Selector anyKinesisRecord() {
-        return Selectors.type(KinesisRecord.class);
-    }
+	public static Selector anyKinesisRecord() {
+		return Selectors.type(KinesisRecord.class);
+	}
 
-    public static Selector streamArn(String arn) {
-        return Selectors.predicate(it -> {
-            if (it instanceof KinesisRecord) {
-                KinesisRecord kr = (KinesisRecord) it;
-                return arn.equals(kr.getStreamArn());
-            }
-            return false;
-        });
-    }
+	public static Selector streamArn(String arn) {
+		return Selectors.predicate(it -> {
+			if (it instanceof KinesisRecord) {
+				KinesisRecord kr = (KinesisRecord) it;
+				return arn.equals(kr.getStreamArn());
+			}
+			return false;
+		});
+	}
 
-    public static Selector streamName(String name) {
-        return Selectors.predicate(it -> {
-            if (it instanceof KinesisRecord) {
-                KinesisRecord kr = (KinesisRecord) it;
-                return kr.getStreamName().equals(name);
-            }
-            return false;
-        });
-    }
+	public static Selector streamName(String name) {
+		return Selectors.predicate(it -> {
+			if (it instanceof KinesisRecord) {
+				KinesisRecord kr = (KinesisRecord) it;
+				return kr.getStreamName().equals(name);
+			}
+			return false;
+		});
+	}
 }

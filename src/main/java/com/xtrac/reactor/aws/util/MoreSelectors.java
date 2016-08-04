@@ -21,56 +21,58 @@ import reactor.fn.Predicate;
 
 public class MoreSelectors {
 
-    public static Selector<JsonNode> jsonPredicate(Predicate<JsonNode> n) {
-        return typedPredicate(n);
-    }
+	public static Selector<JsonNode> jsonPredicate(Predicate<JsonNode> n) {
+		return typedPredicate(n);
+	}
 
-    /**
-     * Generic version of Selectors.predicate()
-     *
-     * @param p typed predicate
-     * @param <T> type
-     * @return Selector
-     */
-    public static <T> Selector<T> typedPredicate(final Predicate<T> p) {
-        Predicate<Object> x = t -> {
-            if (t != null) {
-                try {
-                    return p.test((T) t);
-                } catch (ClassCastException e) {
-                    // Not really a problem. Due to Java's type erasure,
-                    // can't do an instnaceof check, so this will
-                    // have to do.
-                }
-            }
-            return false;
-        };
-        return Selectors.predicate(x);
-    }
+	/**
+	 * Generic version of Selectors.predicate()
+	 *
+	 * @param p
+	 *            typed predicate
+	 * @param <T>
+	 *            type
+	 * @return Selector
+	 */
+	public static <T> Selector<T> typedPredicate(final Predicate<T> p) {
+		Predicate<Object> x = t -> {
+			if (t != null) {
+				try {
+					return p.test((T) t);
+				} catch (ClassCastException e) {
+					// Not really a problem. Due to Java's type erasure,
+					// can't do an instnaceof check, so this will
+					// have to do.
+				}
+			}
+			return false;
+		};
+		return Selectors.predicate(x);
+	}
 
-    public static Selector all(Selector... selectors) {
-        Selector composite = new Selector() {
+	public static Selector all(Selector... selectors) {
+		Selector composite = new Selector() {
 
-            @Override
-            public Object getObject() {
-                return this;
-            }
+			@Override
+			public Object getObject() {
+				return this;
+			}
 
-            @Override
-            public boolean matches(Object key) {
-                for (Selector s : selectors) {
-                    if (!s.matches(key)) {
-                        return false;
-                    }
-                }
-                return true;
-            }
+			@Override
+			public boolean matches(Object key) {
+				for (Selector s : selectors) {
+					if (!s.matches(key)) {
+						return false;
+					}
+				}
+				return true;
+			}
 
-            @Override
-            public HeaderResolver getHeaderResolver() {
-                return null;
-            }
-        };
-        return composite;
-    }
+			@Override
+			public HeaderResolver getHeaderResolver() {
+				return null;
+			}
+		};
+		return composite;
+	}
 }

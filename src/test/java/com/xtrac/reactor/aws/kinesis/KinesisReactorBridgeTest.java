@@ -21,23 +21,21 @@ import com.xtrac.reactor.aws.kinesis.KinesisReactorBridge;
 import reactor.Environment;
 import reactor.bus.EventBus;
 
-public class KinesisReactorBridgeTest  {
+public class KinesisReactorBridgeTest {
 
 	static EventBus bus = EventBus.create(Environment.initializeIfEmpty());
 
-	
-	
 	@Test
 	public void testIt() {
 		try {
 			new KinesisReactorBridge.Builder().build();
 			Assertions.failBecauseExceptionWasNotThrown(IllegalStateException.class);
-			
+
 		} catch (Exception e) {
 			Assertions.assertThat(e).isInstanceOf(IllegalArgumentException.class);
 		}
 	}
-	
+
 	@Test
 	public void testA() {
 		new KinesisReactorBridge.Builder().withEventBus(bus);

@@ -24,23 +24,19 @@ import java.util.regex.Pattern;
 import org.junit.AfterClass;
 import org.junit.Assume;
 import org.junit.BeforeClass;
-import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.amazonaws.ClientConfiguration;
 import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
-import com.amazonaws.services.kinesis.AmazonKinesisAsyncClient;
 import com.amazonaws.services.sqs.AmazonSQSAsyncClient;
-import com.amazonaws.services.sqs.model.CreateQueueRequest;
 import com.amazonaws.services.sqs.model.CreateQueueResult;
 import com.amazonaws.services.sqs.model.ListQueuesResult;
 import com.amazonaws.services.sqs.model.QueueDoesNotExistException;
 import com.amazonaws.services.sqs.model.ReceiveMessageResult;
 import com.xtrac.Config;
 
-import ch.qos.logback.core.boolex.Matcher;
 import reactor.Environment;
 import reactor.bus.EventBus;
 
@@ -135,14 +131,14 @@ public abstract class AbstractSQSIntegrationTest {
 			}
 
 			ClientConfiguration clientConfiguration = new ClientConfiguration();
-			if (config.getProxyHost() != null && ! config.getProxyHost().equals("")) {
+			if (config.getProxyHost() != null && !config.getProxyHost().equals("")) {
 				clientConfiguration.setProxyHost(config.getProxyHost());
 				clientConfiguration.setProxyPort(config.getProxyPort());
 			}
 			Regions region = Regions.fromName(config.getRegionName());
 
 			client = new AmazonSQSAsyncClient(clientConfiguration);
-			client.setRegion(Region.getRegion(region));			
+			client.setRegion(Region.getRegion(region));
 			url = client.getQueueUrl(queueName).getQueueUrl();
 			log.info("using url: " + url);
 		} catch (QueueDoesNotExistException e) {
@@ -163,8 +159,7 @@ public abstract class AbstractSQSIntegrationTest {
 
 		Assume.assumeTrue(client != null && url != null && bus != null);
 	}
-	
-	
+
 	public AmazonSQSAsyncClient getSQSClient() {
 		return client;
 	}

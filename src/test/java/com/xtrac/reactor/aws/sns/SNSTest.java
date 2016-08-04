@@ -36,30 +36,24 @@ import com.amazonaws.auth.policy.conditions.ConditionFactory;
 import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.sns.AmazonSNSAsyncClient;
-import com.amazonaws.services.sns.AmazonSNSClient;
 import com.amazonaws.services.sns.model.CreateTopicRequest;
 import com.amazonaws.services.sns.model.CreateTopicResult;
 import com.amazonaws.services.sns.model.SubscribeRequest;
 import com.amazonaws.services.sns.model.SubscribeResult;
 import com.amazonaws.services.sqs.AmazonSQSAsyncClient;
-import com.amazonaws.services.sqs.AmazonSQSClient;
 import com.amazonaws.services.sqs.model.CreateQueueRequest;
 import com.amazonaws.services.sqs.model.CreateQueueResult;
 import com.amazonaws.services.sqs.model.GetQueueAttributesRequest;
 import com.amazonaws.services.sqs.model.GetQueueAttributesResult;
-import com.amazonaws.services.sqs.model.ReceiveMessageResult;
 import com.amazonaws.services.sqs.model.SetQueueAttributesRequest;
-import com.google.common.collect.ImmutableList;
 import com.xtrac.Config;
 import com.xtrac.reactor.aws.sns.SNSMessage;
 import com.xtrac.reactor.aws.sns.SNSSelectors;
-import com.xtrac.reactor.aws.sqs.AbstractSQSIntegrationTest;
 import com.xtrac.reactor.aws.sqs.SQSReactorBridge;
 
 import reactor.Environment;
 import reactor.bus.Event;
 import reactor.bus.EventBus;
-import reactor.bus.selector.Selectors;
 
 public class SNSTest {
 
@@ -111,7 +105,7 @@ public class SNSTest {
 		Config config = new Config(configProps);
 
 		ClientConfiguration clientConfiguration = new ClientConfiguration();
-		if (config.getProxyHost() != null && ! config.getProxyHost().equals("")) {
+		if (config.getProxyHost() != null && !config.getProxyHost().equals("")) {
 			clientConfiguration.setProxyHost(config.getProxyHost());
 			clientConfiguration.setProxyPort(config.getProxyPort());
 		}

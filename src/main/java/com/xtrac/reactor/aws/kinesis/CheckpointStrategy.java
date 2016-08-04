@@ -18,5 +18,6 @@ import com.amazonaws.services.kinesis.model.Record;
 import rx.functions.Func1;
 
 public interface CheckpointStrategy extends Func1<Record, Boolean> {
+	@Override
 	Boolean call(Record record);
 }

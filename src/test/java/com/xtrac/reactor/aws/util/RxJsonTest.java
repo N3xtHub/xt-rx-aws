@@ -23,16 +23,15 @@ import rx.Observable;
 
 public class RxJsonTest {
 
-	
 	@Test
 	public void testIt() {
 		JsonNode n = Observable.just("{\"name\":\"Rob\"}").flatMap(RxJson.STRING_TO_JSON).toBlocking().first();
-		
+
 		Assertions.assertThat(n.path("name").asText()).isEqualTo("Rob");
-		
-		 Assertions.assertThat(Observable.just("{\"name\":\"Rob\"").flatMap(RxJson.STRING_TO_JSON).toList().toBlocking().first()).hasSize(0);
-			
-			
-		
+
+		Assertions.assertThat(
+				Observable.just("{\"name\":\"Rob\"").flatMap(RxJson.STRING_TO_JSON).toList().toBlocking().first())
+				.hasSize(0);
+
 	}
 }

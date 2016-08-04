@@ -28,36 +28,34 @@ public class SQSMessageSelectorsTest {
 
 	@Test
 	public void testArn() {
-		
+
 		Selector s = SQSMessageSelectors.arn("foo:bar");
-		
+
 		Assertions.assertThat(s).isNotNull();
-		
+
 		Assertions.assertThat(Selectors.$("test").getObject()).isEqualTo("test");
 
-		
 		Assertions.assertThat(s.matches("foo")).isFalse();
-		
+
 		Assertions.assertThat(s.matches("foo:bar")).isFalse();
-		
+
 		Message m = new Message();
 		SQSReactorBridge b = new SQSReactorBridge();
-		
-		SQSMessage sqsMessage = new SQSMessage(b,m);
-		
+
+		SQSMessage sqsMessage = new SQSMessage(b, m);
+
 		Assertions.assertThat(s.matches(sqsMessage)).isFalse();
-		
+
 		Assertions.assertThat(sqsMessage.getMessage().getAttributes().get("arn")).isNull();
-		
+
 		m.getAttributes().put("arn", "baz:baz");
-		
+
 		Assertions.assertThat(sqsMessage.getMessage().getAttributes().get("arn")).isEqualTo("baz:baz");
-		
+
 	}
-	
+
 	@Test
 	public void testDate() {
-		
-		
+
 	}
 }

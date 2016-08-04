@@ -25,7 +25,7 @@ import com.fasterxml.jackson.databind.node.MissingNode;
 public class SNSMessage {
 
 	static Logger logger = LoggerFactory.getLogger(SNSMessage.class);
-	
+
 	static ObjectMapper mapper = new ObjectMapper();
 
 	JsonNode snsEnvelope;
@@ -46,7 +46,7 @@ public class SNSMessage {
 			return jsonBody;
 		} catch (IOException e) {
 			jsonBody = MissingNode.getInstance();
-			logger.warn("problem parsing json: "+e.toString());
+			logger.warn("problem parsing json: " + e.toString());
 		}
 		return jsonBody;
 	}
@@ -58,27 +58,35 @@ public class SNSMessage {
 	public String getType() {
 		return snsEnvelope.path("Type").asText(null);
 	}
+
 	public String getMessageId() {
 		return snsEnvelope.path("MessageId").asText(null);
 	}
+
 	public String getSubject() {
 		return snsEnvelope.path("Subject").asText(null);
 	}
+
 	public String getTopicArn() {
 		return snsEnvelope.path("TopicArn").asText(null);
 	}
+
 	public String getTimestamp() {
 		return snsEnvelope.path("Timestamp").asText(null);
 	}
+
 	public String getSignatureVersion() {
 		return snsEnvelope.path("SignatureVersion").asText(null);
 	}
+
 	public String getSignature() {
 		return snsEnvelope.path("Signature").asText(null);
 	}
+
 	public String getSigningCertUrl() {
 		return snsEnvelope.path("SigningCertURL").asText(null);
 	}
+
 	public String getUnsubscribeURL() {
 		return snsEnvelope.path("UnsubscribeURL").asText(null);
 	}

@@ -36,7 +36,6 @@ import com.amazonaws.ClientConfiguration;
 import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.kinesis.AmazonKinesisAsyncClient;
-import com.amazonaws.services.kinesis.AmazonKinesisClient;
 import com.amazonaws.services.kinesis.model.ListStreamsRequest;
 import com.google.common.base.Strings;
 import com.xtrac.Config;
@@ -49,13 +48,13 @@ public abstract class AbstractKinesisIntegrationTest {
 	static AmazonKinesisAsyncClient kinesisClient = null;
 	static Config config = null;
 	static Properties configProps = null;
-	
+
 	public static AmazonKinesisAsyncClient getKinesisClient() {
-		
+
 		if (kinesisClient == null) {
-			 
+
 			try {
-				
+
 				configProps = readConfig();
 				config = new Config(configProps);
 			} catch (FileNotFoundException e) {
@@ -65,41 +64,40 @@ public abstract class AbstractKinesisIntegrationTest {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
-			
+
 			ClientConfiguration clientConfiguration = new ClientConfiguration();
-			
-			if (config.getProxyHost() != null && ! config.getProxyHost().equals("")) {
+
+			if (config.getProxyHost() != null && !config.getProxyHost().equals("")) {
 				clientConfiguration.setProxyHost(config.getProxyHost());
 				clientConfiguration.setProxyPort(config.getProxyPort());
 			}
-			
-		    kinesisClient = new AmazonKinesisAsyncClient(clientConfiguration);
-		    Regions region = Regions.fromName(config.getRegionName() );    	 
-		    kinesisClient.setRegion(Region.getRegion( region));
-		    
-		    
+
+			kinesisClient = new AmazonKinesisAsyncClient(clientConfiguration);
+			Regions region = Regions.fromName(config.getRegionName());
+			kinesisClient.setRegion(Region.getRegion(region));
+
 		}
 		return kinesisClient;
 	}
 
 	private static Properties readConfig() throws FileNotFoundException, IOException {
-        String propFilePath = System.getenv("CONFIG_PATH");
-        
-        log.info("config path: " + propFilePath);
-        if(propFilePath == null) {
-            throw new RuntimeException("CONFIG_PATH environment variable not set - cannot read configuration properties");
-        }
+		String propFilePath = System.getenv("CONFIG_PATH");
 
-        File file = new File(propFilePath);
-        FileInputStream fileInput = new FileInputStream(file);
-        Properties properties = new Properties();
-        properties.load(fileInput);
-        fileInput.close();
+		log.info("config path: " + propFilePath);
+		if (propFilePath == null) {
+			throw new RuntimeException(
+					"CONFIG_PATH environment variable not set - cannot read configuration properties");
+		}
 
-        return properties;
-    }
-	
+		File file = new File(propFilePath);
+		FileInputStream fileInput = new FileInputStream(file);
+		Properties properties = new Properties();
+		properties.load(fileInput);
+		fileInput.close();
+
+		return properties;
+	}
+
 	@Before
 	public void checkAvailability() {
 		Assume.assumeTrue(kinesisAvailable);
@@ -177,8 +175,8 @@ public abstract class AbstractKinesisIntegrationTest {
 		} catch (RuntimeException e) {
 
 			log.warn("could not get stream...integration tests will be disabled: " + e.toString());
-			kinesisAvailable=false;
-			
+			kinesisAvailable = false;
+
 		}
 
 		if (kinesisAvailable) {

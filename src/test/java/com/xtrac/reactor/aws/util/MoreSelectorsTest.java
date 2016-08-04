@@ -45,8 +45,7 @@ public class MoreSelectorsTest {
 		// Now make sure that we behave similarly
 		Assertions.assertThat(s.getHeaderResolver()).isNull();
 		Assertions.assertThat(s.getObject()).isNotNull();
-		
-		
+
 		Assertions.assertThat(s.matches(mapper.createObjectNode().put("name", "Fo Bar"))).isTrue();
 		Assertions.assertThat(s.matches(mapper.createObjectNode())).isFalse();
 		Assertions.assertThat(s.matches(mapper.createArrayNode())).isFalse();

@@ -20,7 +20,7 @@ public class EventUtil {
 
 	public static void copyEventHeaders(Event<?> source, Event<?> dest) {
 		Headers h = source.getHeaders();
-		
+
 		dest.getHeaders().setAll(h.asMap());
 	}
 }

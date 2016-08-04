@@ -13,24 +13,16 @@
  */
 package com.xtrac.reactor.aws.sqs;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 
 import com.amazonaws.ClientConfiguration;
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
-import com.amazonaws.regions.Region;
-import com.amazonaws.regions.Regions;
 import com.amazonaws.services.sqs.AmazonSQSAsyncClient;
-import com.xtrac.reactor.aws.sns.SNSMessage;
 import com.xtrac.reactor.aws.sqs.SQSReactorBridge;
 
 import reactor.Environment;
-import reactor.bus.Event;
 import reactor.bus.EventBus;
-import reactor.bus.selector.Selectors;
 
 public class SQSReactorBridgeTest {
 
@@ -64,13 +56,9 @@ public class SQSReactorBridgeTest {
 	@Test
 	public void testBuilderSuccess() {
 		ClientConfiguration clientConfiguration = new ClientConfiguration();
-		 
-		SQSReactorBridge bridge = new SQSReactorBridge.Builder()
-				.withRegion("us-west-1")
-				.withEventBus(bus)
-				.withUrl("https://api.example.com")
-				.withClientConfiguration(clientConfiguration)
-				.build();
+
+		SQSReactorBridge bridge = new SQSReactorBridge.Builder().withRegion("us-west-1").withEventBus(bus)
+				.withUrl("https://api.example.com").withClientConfiguration(clientConfiguration).build();
 		Assertions.assertThat(bridge).isNotNull();
 		Assertions.assertThat(bridge.getFailureCount().get()).isEqualTo(0);
 		Assertions.assertThat(bridge.getEventBus()).isSameAs(bus);
@@ -79,17 +67,13 @@ public class SQSReactorBridgeTest {
 		Assertions.assertThat(bridge.waitTimeSeconds).isEqualTo(10);
 
 		AmazonSQSAsyncClient sqsClient = new AmazonSQSAsyncClient(new DefaultAWSCredentialsProviderChain());
-		bridge = new SQSReactorBridge.Builder()
-				.withRegion("us-west-1")
-				.withEventBus(bus)
-				.withUrl("https://api.example.com")
-				.withSQSClient(sqsClient).build();
+		bridge = new SQSReactorBridge.Builder().withRegion("us-west-1").withEventBus(bus)
+				.withUrl("https://api.example.com").withSQSClient(sqsClient).build();
 
 		Assertions.assertThat(bridge.getAsyncClient()).isNotNull();
 		Assertions.assertThat(bridge.getAsyncClient()).isSameAs(sqsClient);
 		Assertions.assertThat(bridge.isAutoDeleteEnabled()).isTrue();
 
 	}
-	
 
 }

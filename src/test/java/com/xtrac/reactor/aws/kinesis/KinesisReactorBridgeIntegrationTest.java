@@ -36,71 +36,73 @@ import reactor.bus.Event;
 import reactor.bus.EventBus;
 import reactor.bus.selector.Selectors;
 
-public class KinesisReactorBridgeIntegrationTest extends AbstractKinesisIntegrationTest{
+public class KinesisReactorBridgeIntegrationTest extends AbstractKinesisIntegrationTest {
 
 	@Test
 	public void testIt() throws InterruptedException {
 		Assume.assumeTrue(kinesisAvailable);
+		
+		
 		EventBus bus = EventBus.create(Environment.initializeIfEmpty());
-		Regions region = Regions.fromName(config.getRegionName() ); 
-		KinesisReactorBridge bridge = new KinesisReactorBridge.Builder().withRegion(region)
-				.withAppName("test").withEventBus(bus).withStreamName(getStreamName()).withAdditionalConfig(c -> {
+		
+		Regions region = Regions.fromName(config.getRegionName());
+		
+		KinesisReactorBridge bridge = new KinesisReactorBridge.Builder().withRegion(region).withAppName("workflow")
+				.withEventBus(bus).withStreamName(getStreamName()).withAdditionalConfig(c -> {
 					c.withInitialPositionInStream(InitialPositionInStream.TRIM_HORIZON);
 				}).build().start();
 
 		CountDownLatch latch = new CountDownLatch(1);
-		String message = "Hello " + UUID.randomUUID().toString();
 		
+		String message = "{\"workItem\":{\"fileNumber\":\"W026938-02AUG16\",\"orgId\":1021,\"itemType\":\"Project Request\",\"status\":\"APRQ\",\"statusType\":\"P\",\"statusDate\":\"2016-08-02T18:47:23-0500\",\"suspenseStatus\":\"A\",\"splitStatus\":\"N\",\"memo\":\" \",\"amount\":0,\"currentQueue\":\"A045103\",\"currentNode\":\"Management\",\"nodeAccessGroup\":\"Management\",\"creatingOperator\":\"A045103\",\"nodeWhereCreated\":\"Management\",\"createDate\":\"2016-08-02T18:47:23-0500\",\"lastEvent\":\"ENTER\",\"lastEventDate\":\"2016-08-02T18:47:23-0500\",\"priorityNumber\":0,\"suspensionCount\":0,\"suspensionDuration\":0,\"queueType\":1,\"queueEnterTime\":\"2016-08-02T18:47:23-0500\",\"parentFileNumber\":0,\"nonCntrSuspensionCount\":0,\"nonCntrSuspensionDuration\":0,\"familyId\":26938080216,\"modOperId\":\"A045103\",\"noteCount\":0,\"parties\":[{\"partyNumber\":1,\"name\":\"ORIG\",\"taxReportingCode\":\" \",\"organizationName\":\"ACME\",\"accountNumber\":\"111\"}]},\"eventDetail\":{\"name\":\"CREATE_EVENT\",\"id\":142914,\"timestamp\":\"2016-08-02T18:47:23-0500\"}} "
+				+ UUID.randomUUID().toString();
+
 		AtomicReference<Event<KinesisRecord>> eventRef = new AtomicReference<Event<KinesisRecord>>(null);
 		bus.on(Selectors.T(KinesisRecord.class), (Event<KinesisRecord> x) -> {
 
 			try {
-				
+
 				String s = x.getData().getBodyAsString();
-				
-				log.info("Received: {}",s);
+
+				log.info("Received: {}", s);
 				if (s.equals(message)) {
 					latch.countDown();
 					eventRef.set(x);
 				}
-				
-				
+
 			} catch (RuntimeException e) {
 				e.printStackTrace();
 			}
 		});
 
-		PutRecordResult xx = bridge.getKinesisClient().putRecord(getStreamName(),
-				ByteBuffer.wrap(message.getBytes()), "test");
+		PutRecordResult xx = bridge.getKinesisClient().putRecord(getStreamName(), ByteBuffer.wrap(message.getBytes()),
+				"workflow");
 
 		boolean success = latch.await(2, TimeUnit.MINUTES);
 		Assertions.assertThat(success).isTrue();
-		
+
 		Assertions.assertThat(eventRef.get()).isNotNull();
 		Assertions.assertThat(eventRef.get().getKey()).isInstanceOf(KinesisRecord.class);
-		
+
 		Assertions.assertThat(eventRef.get().getKey()).isSameAs(eventRef.get().getData());
-		
-			// we don't do anything with headers
-		
+		// we don't do anything with headers
+
 		KinesisRecord kr = eventRef.get().getData();
 		Assertions.assertThat(kr.getStreamName()).isEqualTo(bridge.getStreamName());
 		Assertions.assertThat(kr.getBridge()).isSameAs(bridge);
 		Assertions.assertThat(bridge.getArn()).startsWith("arn:aws:kinesis:");
 		Assertions.assertThat(kr.getStreamArn()).isEqualTo(bridge.getStreamArn());
-		Assertions.assertThat(kr.getBodyAsString()).startsWith("Hello");
-		
+		Assertions.assertThat(kr.getBodyAsString()).startsWith("{\"workItem");
+
 		Record r = kr.getRecord();
 		Assertions.assertThat(r.getSequenceNumber()).isNotNull();
-		Assertions.assertThat(r.getPartitionKey()).isEqualTo("test");
+		Assertions.assertThat(r.getPartitionKey()).isEqualTo("workflow");
 		Assertions.assertThat(r.getApproximateArrivalTimestamp()).isCloseTo(new Date(), 120000);
-		
 
-		
 		Thread.sleep(5000);
-		
+
 		bridge.stop();
-		
+
 		Thread.sleep(5000);
 	}
 }

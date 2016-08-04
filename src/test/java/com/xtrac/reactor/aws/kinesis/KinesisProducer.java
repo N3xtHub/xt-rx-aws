@@ -30,27 +30,25 @@ import com.amazonaws.services.kinesis.AmazonKinesisClient;
 import com.amazonaws.services.kinesis.model.PutRecordResult;
 import com.xtrac.Config;
 
-
-
 public class KinesisProducer {
-	
-	final  static Logger log = LoggerFactory.getLogger(KinesisProducer.class);
-	
+
+	final static Logger log = LoggerFactory.getLogger(KinesisProducer.class);
+
 	public static final void main(String[] args) throws Exception {
-		
+
 		Properties configProps = readConfig();
 		Config config = new Config(configProps);
-		
+
 		ClientConfiguration clientConfiguration = new ClientConfiguration();
-		
-		if (config.getProxyHost() != null && ! config.getProxyHost().equals("")) {
+
+		if (config.getProxyHost() != null && !config.getProxyHost().equals("")) {
 			clientConfiguration.setProxyHost(config.getProxyHost());
 			clientConfiguration.setProxyPort(config.getProxyPort());
 		}
-		
-	    AmazonKinesisClient client = new AmazonKinesisClient(clientConfiguration);
-	    Regions region = Regions.fromName(config.getRegionName() );    	 
-		client.setRegion(Region.getRegion( region));
+
+		AmazonKinesisClient client = new AmazonKinesisClient(clientConfiguration);
+		Regions region = Regions.fromName(config.getRegionName());
+		client.setRegion(Region.getRegion(region));
 
 		for (int i = 0; i < 5; i++) {
 			PutRecordResult prr = client.putRecord(config.getStream(),
@@ -61,22 +59,23 @@ public class KinesisProducer {
 		Thread.sleep(1);
 
 	}
-	
+
 	private static Properties readConfig() throws FileNotFoundException, IOException {
-        String propFilePath = System.getenv("CONFIG_PATH");
-        
-        log.info("config path: " + propFilePath);
-        System.err.println("prop file path is " + propFilePath);
-        if(propFilePath == null) {
-            throw new RuntimeException("CONFIG_PATH environment variable not set - cannot read configuration properties");
-        }
+		String propFilePath = System.getenv("CONFIG_PATH");
 
-        File file = new File(propFilePath);
-        FileInputStream fileInput = new FileInputStream(file);
-        Properties properties = new Properties();
-        properties.load(fileInput);
-        fileInput.close();
+		log.info("config path: " + propFilePath);
+		System.err.println("prop file path is " + propFilePath);
+		if (propFilePath == null) {
+			throw new RuntimeException(
+					"CONFIG_PATH environment variable not set - cannot read configuration properties");
+		}
 
-        return properties;
-    }
+		File file = new File(propFilePath);
+		FileInputStream fileInput = new FileInputStream(file);
+		Properties properties = new Properties();
+		properties.load(fileInput);
+		fileInput.close();
+
+		return properties;
+	}
 }

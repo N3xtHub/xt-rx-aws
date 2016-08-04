@@ -25,23 +25,22 @@ import rx.RxReactiveStreams;
 
 public class SQSReactiveStreamAdapters {
 
-	
-	public static  Observable<Event<SQSMessage>> toObservableEvent(Publisher<? extends Event<?>> publisher) {
+	public static Observable<Event<SQSMessage>> toObservableEvent(Publisher<? extends Event<?>> publisher) {
 		return (Observable<Event<SQSMessage>>) RxReactiveStreams.toObservable(publisher);
 	}
-	
-	public static  Observable<SQSMessage> toObservableSQSMessage(Publisher<? extends Event<?>> publisher) {
+
+	public static Observable<SQSMessage> toObservableSQSMessage(Publisher<? extends Event<?>> publisher) {
 		return toObservableEvent(publisher).map(event -> event.getData());
 	}
-	
-	public static  Observable<Message> toObservableMessage(Publisher<? extends Event<?>> publisher) {
-		return  toObservableSQSMessage(publisher).map(sqs -> sqs.getMessage());
+
+	public static Observable<Message> toObservableMessage(Publisher<? extends Event<?>> publisher) {
+		return toObservableSQSMessage(publisher).map(sqs -> sqs.getMessage());
 	}
-	
-	public static  Observable<String> toObservablString(Publisher<? extends Event<?>> publisher) {
-		return toObservableMessage(publisher).map(m->m.getBody());
+
+	public static Observable<String> toObservablString(Publisher<? extends Event<?>> publisher) {
+		return toObservableMessage(publisher).map(m -> m.getBody());
 	}
-	
+
 	public static Observable<JsonNode> toObservableJsonNode(Publisher<? extends Event<?>> publisher) {
 		return toObservablString(publisher).flatMap(RxJson.STRING_TO_JSON);
 	}

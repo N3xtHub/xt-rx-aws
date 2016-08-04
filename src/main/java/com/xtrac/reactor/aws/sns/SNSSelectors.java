@@ -27,24 +27,20 @@ public class SNSSelectors {
 	static Logger logger = LoggerFactory.getLogger(SNSSelectors.class);
 	static ObjectMapper mapper = new ObjectMapper();
 
-	
-
 	public static Selector snsTopicSelector(String name) {
-		return MoreSelectors.typedPredicate((SNSMessage m) -> {		
-			return m.getTopicArn().endsWith(":"+name);
+		return MoreSelectors.typedPredicate((SNSMessage m) -> {
+			return m.getTopicArn().endsWith(":" + name);
 		});
 	}
-	
+
 	public static Selector snsTopicArnSelector(String arn) {
-		return MoreSelectors.typedPredicate((SNSMessage m) -> {		
+		return MoreSelectors.typedPredicate((SNSMessage m) -> {
 			return m.getTopicArn().equals(arn);
 		});
 	}
-	
+
 	public static Selector anySNSMessageSelector() {
 		return Selectors.type(SNSMessage.class);
 	}
 
-
-	
 }
