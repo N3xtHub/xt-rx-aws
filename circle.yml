@@ -25,4 +25,4 @@ deployment:
     bintray:
         branch: master
         commands:
-            - ./gradlew bintrayUpload -Puser=$BINTRAY_USERNAME -Pkey=$BINTRAY_PASS
+            - ./gradlew bintrayUpload -Puser=${BINTRAY_USERNAME} -Pkey=${BINTRAY_PASS}
