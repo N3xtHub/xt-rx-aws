@@ -95,15 +95,14 @@ bintray {
 	pkg {
 		repo = 'maven'
 		name = 'com.xtrac.xt-rx-aws'
-		userOrg = xtraclabs
+		userOrg = 'xtraclabs'
 		licenses = ['Apache-2.0']
 		vcsUrl = 'https://github.com/xtraclabs/xt-rx-aws.git'
 		labels = ['rx-aws']
 		publicDownloadNumbers = true
-		//attributes= ['a': ['ay1', 'ay2'], 'b': ['bee'], c: 'cee'] //Optional package-level attributes
 		version {
-			name = '1.0-Final'
-			desc = 'Gradle Bintray Plugin 1.0 final'
+			name = '1.0-Release'
+			desc = 'Xtrac XT AWS 1.0 release'
 			vcsTag = '1.0'
 			attributes = ['gradle-plugin': 'com.use.less:com.use.less.gradle:gradle-useless-plugin']
 		}
