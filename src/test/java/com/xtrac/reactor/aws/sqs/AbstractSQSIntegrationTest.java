@@ -135,7 +135,7 @@ public abstract class AbstractSQSIntegrationTest {
 			}
 
 			ClientConfiguration clientConfiguration = new ClientConfiguration();
-			if (config.getProxyHost() != null && config.getProxyHost()!= ""){
+			if (config.getProxyHost() != null && ! config.getProxyHost().equals("")) {
 				clientConfiguration.setProxyHost(config.getProxyHost());
 				clientConfiguration.setProxyPort(config.getProxyPort());
 			}

@@ -81,11 +81,11 @@ public class Config {
         consumerName = props.getProperty("consumerName");
         dbUrl = props.getProperty("dbUrl");
         eventQ = props.getProperty("eventQ");
-        if (props.getProperty("proxyHost") !="") {
+        if (! props.getProperty("proxyHost").equals("")) {
     	 proxyHost = props.getProperty("proxyHost");
         }
        
-        if (props.getProperty("proxyPort") !="") {
+        if (! proxyHost.equals("")) {
         proxyPort = Integer.valueOf(props.getProperty("proxyPort"));
         }
         regionName = props.getProperty("awsRegion");

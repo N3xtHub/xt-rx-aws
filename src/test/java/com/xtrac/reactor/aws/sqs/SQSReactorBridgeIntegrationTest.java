@@ -72,7 +72,7 @@ public class SQSReactorBridgeIntegrationTest extends AbstractSQSIntegrationTest 
 		Config config = new Config(configProps);
 
 		ClientConfiguration clientConfiguration = new ClientConfiguration();
-		if (config.getProxyHost() != null && config.getProxyHost() != "") {
+		if (config.getProxyHost() != null && ! config.getProxyHost().equals("")) {
 			clientConfiguration.setProxyHost(config.getProxyHost());
 			clientConfiguration.setProxyPort(config.getProxyPort());
 		}
