@@ -16,14 +16,15 @@ package com.xtrac.reactor.aws.kinesis;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+
+import org.apache.commons.logging.LogFactory;
 
 import com.amazonaws.services.kinesis.model.Record;
 
 public class TimeIntervalCheckpointStrategy implements CheckpointStrategy {
 
-	private static final Logger logger = LoggerFactory.getLogger(TimeIntervalCheckpointStrategy.class);
+	private final static Log log = LogFactory.getLog(TimeIntervalCheckpointStrategy.class);
 	public static final long DEFAULT_INTERVAL_MILLIS = TimeUnit.SECONDS.toMillis(30);
 	private final AtomicLong lastCheckpoint = new AtomicLong(0);
 	private long checkpointIntervalMillis = 30000;

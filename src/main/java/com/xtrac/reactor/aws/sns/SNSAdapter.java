@@ -15,8 +15,9 @@ package com.xtrac.reactor.aws.sns;
 
 import java.io.IOException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+
+import org.apache.commons.logging.LogFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -31,7 +32,7 @@ import reactor.fn.Consumer;
 
 public class SNSAdapter implements Consumer<Event<SQSMessage>> {
 
-	static Logger logger = LoggerFactory.getLogger(SNSAdapter.class);
+	final static Log log = LogFactory.getLog(SNSAdapter.class);
 	static ObjectMapper mapper = new ObjectMapper();
 	EventBus bus;
 
@@ -51,7 +52,7 @@ public class SNSAdapter implements Consumer<Event<SQSMessage>> {
 			}
 
 		} catch (IOException e) {
-			logger.warn("could not parse message: " + e.toString());
+			log.warn("could not parse message: " + e.toString());
 		}
 	}
 
@@ -69,7 +70,7 @@ public class SNSAdapter implements Consumer<Event<SQSMessage>> {
 
 				return b;
 			} catch (IOException e) {
-				logger.warn("could not parse message: " + e.toString());
+				log.warn("could not parse message: " + e.toString());
 			}
 
 			return false;

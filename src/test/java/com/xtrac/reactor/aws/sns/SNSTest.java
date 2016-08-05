@@ -21,8 +21,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+
+import org.apache.commons.logging.LogFactory;
 
 import com.amazonaws.ClientConfiguration;
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
@@ -57,7 +58,7 @@ import reactor.bus.EventBus;
 
 public class SNSTest {
 
-	static Logger log = LoggerFactory.getLogger(SNSTest.class);
+	final static Log log = LogFactory.getLog(SNSTest.class);
 
 	private static Properties readConfig() throws FileNotFoundException, IOException {
 		String propFilePath = System.getenv("CONFIG_PATH");

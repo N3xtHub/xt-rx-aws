@@ -41,8 +41,9 @@ import com.google.common.base.Suppliers;
 import com.xtrac.Config;
 import com.xtrac.reactor.aws.AbstractReactorBridge;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+
+import org.apache.commons.logging.LogFactory;
 import reactor.bus.Event;
 import reactor.bus.EventBus;
 import reactor.bus.selector.Selector;
@@ -63,7 +64,7 @@ import java.util.function.Consumer;
 
 public class KinesisReactorBridge extends AbstractReactorBridge {
 
-	private static final Logger log = LoggerFactory.getLogger(KinesisReactorBridge.class);
+	private final static Log log = LogFactory.getLog(KinesisReactorBridge.class);
 	private KinesisClientLibConfiguration kinesisConfig;
 
 	private Worker worker;
@@ -156,7 +157,7 @@ public class KinesisReactorBridge extends AbstractReactorBridge {
 
 		@Override
 		public void initialize(InitializationInput initializationInput) {
-			log.info("initializing {} with {}", this, initializationInput);
+			log.info("initializing {} with {}" + initializationInput);
 		}
 
 		@Override
@@ -171,8 +172,8 @@ public class KinesisReactorBridge extends AbstractReactorBridge {
 				if (cp) {
 					try {
 						if (log.isDebugEnabled()) {
-							log.debug("checkpointing app {} for stream {} at {}", kinesisConfig.getApplicationName(),
-									kinesisConfig.getStreamName(), record.getSequenceNumber());
+							log.debug("checkpointing app {} for stream {} at {}"+ kinesisConfig.getApplicationName() +
+									kinesisConfig.getStreamName() + record.getSequenceNumber());
 						}
 						processRecordsInput.getCheckpointer().checkpoint(record);
 					} catch (RuntimeException | InvalidStateException | ShutdownException e) {
@@ -184,7 +185,7 @@ public class KinesisReactorBridge extends AbstractReactorBridge {
 
 		@Override
 		public void shutdown(ShutdownInput shutdownInput) {
-			log.info("shutdown {}", shutdownInput);
+			log.info("shutdown {}" + shutdownInput);
 
 		}
 
@@ -335,23 +336,23 @@ public class KinesisReactorBridge extends AbstractReactorBridge {
 				JsonParsingConsumer.apply(bridge);
 			}
 
-			log.info("bridgeId  : {}", bridge.getId());
-			log.info("appName   : {}", kinesisConfig.getApplicationName());
-			log.info("streamName: {}", kinesisConfig.getStreamName());
-			log.info("regionName: {}", kinesisConfig.getRegionName());
-			log.info("workerId  : {}", kinesisConfig.getWorkerIdentifier());
-			log.info("streamArn : {}", bridge.getStreamArn());
+			log.info("bridgeId  : {}" + bridge.getId());
+			log.info("appName   : {}" + kinesisConfig.getApplicationName());
+			log.info("streamName: {}" + kinesisConfig.getStreamName());
+			log.info("regionName: {}" + kinesisConfig.getRegionName());
+			log.info("workerId  : {}" + kinesisConfig.getWorkerIdentifier());
+			log.info("streamArn : {}" + bridge.getStreamArn());
 
-			log.info("created {} ... don't forget to call start()", bridge);
+			log.info("created {} ... don't forget to call start()" + bridge);
 			return bridge;
 		}
 	}
 
 	public KinesisReactorBridge start() {
-		log.info("starting {}...", this);
+		log.info("starting {}...");
 		IRecordProcessorFactory factory = () -> {
 			BridgeRecordProcessor p = new BridgeRecordProcessor();
-			log.info("creating {}", p);
+			log.info("creating {}");
 			return p;
 		};
 

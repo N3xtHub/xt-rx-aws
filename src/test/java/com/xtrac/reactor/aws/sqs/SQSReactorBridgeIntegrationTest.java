@@ -86,7 +86,7 @@ public class SQSReactorBridgeIntegrationTest extends AbstractSQSIntegrationTest 
 		List<Event<SQSMessage>> list = Lists.newCopyOnWriteArrayList();
 
 		bus.on(Selectors.T(SQSMessage.class), (Event<SQSMessage> evt) -> {
-			log.info("Received: {}", evt);
+			log.info("Received: {}" + evt);
 			list.add(evt);
 			latch.countDown();
 
@@ -96,7 +96,7 @@ public class SQSReactorBridgeIntegrationTest extends AbstractSQSIntegrationTest 
 		getSQSClient().sendMessage(getQueueUrl(), "test2");
 		getSQSClient().sendMessage(getQueueUrl(), "test3");
 		Assertions.assertThat(latch.await(20, TimeUnit.SECONDS)).isTrue();
-		log.info("received all: {}", list.size());
+		log.info("received all: {}" + list.size());
 		list.forEach(evt -> {
 
 			SQSMessage msg = evt.getData();

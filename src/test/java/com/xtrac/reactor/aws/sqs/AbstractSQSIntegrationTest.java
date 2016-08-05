@@ -24,8 +24,9 @@ import java.util.regex.Pattern;
 import org.junit.AfterClass;
 import org.junit.Assume;
 import org.junit.BeforeClass;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+
+import org.apache.commons.logging.LogFactory;
 
 import com.amazonaws.ClientConfiguration;
 import com.amazonaws.regions.Region;
@@ -42,7 +43,7 @@ import reactor.bus.EventBus;
 
 public abstract class AbstractSQSIntegrationTest {
 
-	static Logger log = LoggerFactory.getLogger(AbstractSQSIntegrationTest.class);
+	final static Log log = LogFactory.getLog(AbstractSQSIntegrationTest.class);
 	static AmazonSQSAsyncClient client;
 	static String url;
 	static String queueName = "junit-" + AbstractSQSIntegrationTest.class.getName().replace(".", "-") + "-"
@@ -73,7 +74,7 @@ public abstract class AbstractSQSIntegrationTest {
 	@AfterClass
 	public static void cleanup() {
 		if (url != null && client != null) {
-			log.info("deleting queue: {}", url);
+			log.info("deleting queue: {}" + url);
 			try {
 				client.deleteQueue(url);
 			} catch (RuntimeException e) {
@@ -99,10 +100,10 @@ public abstract class AbstractSQSIntegrationTest {
 				long createTime = Long.parseLong(m.group(1));
 				long ageInMinutes = TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - createTime);
 				if (ageInMinutes > maxAge) {
-					log.info("deleting {} because it is older than {} minutes", url, maxAge);
+					log.info("deleting {} because it is older than {} minutes" + url + maxAge);
 					client.deleteQueue(url);
 				} else {
-					log.info("not deleting {}", url);
+					log.info("not deleting {}" + url);
 				}
 
 			} catch (QueueDoesNotExistException e) {
@@ -179,7 +180,7 @@ public abstract class AbstractSQSIntegrationTest {
 
 			r = getSQSClient().receiveMessage(getQueueUrl());
 		}
-		log.info("queue is empty: {}", getQueueUrl());
+		log.info("queue is empty: {}" + getQueueUrl());
 	}
 
 	public EventBus getEventBus() {

@@ -29,8 +29,9 @@ import java.util.regex.Pattern;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+
+import org.apache.commons.logging.LogFactory;
 
 import com.amazonaws.ClientConfiguration;
 import com.amazonaws.regions.Region;
@@ -42,7 +43,7 @@ import com.xtrac.Config;
 
 public abstract class AbstractKinesisIntegrationTest {
 
-	static Logger log = LoggerFactory.getLogger(AbstractKinesisIntegrationTest.class);
+	static final Log log = LogFactory.getLog(AbstractKinesisIntegrationTest.class);
 	static String streamName = null;
 	static boolean kinesisAvailable = false;
 	static AmazonKinesisAsyncClient kinesisClient = null;
@@ -110,7 +111,7 @@ public abstract class AbstractKinesisIntegrationTest {
 			AmazonKinesisAsyncClient client = getKinesisClient();
 
 			client.listStreams().getStreamNames().forEach(s -> {
-				log.info("existing stream: {}", s);
+				log.info("existing stream: {}" + s);
 
 			});
 			boolean streamAvailable = false;
@@ -125,7 +126,7 @@ public abstract class AbstractKinesisIntegrationTest {
 			}
 
 			if (streamAvailable == false) {
-				log.info("creating stream: {}", getStreamName());
+				log.info("creating stream: {}" + getStreamName());
 				client.createStream(getStreamName(), 1);
 			}
 
@@ -135,10 +136,10 @@ public abstract class AbstractKinesisIntegrationTest {
 				com.amazonaws.services.kinesis.model.DescribeStreamResult result = client
 						.describeStream(getStreamName());
 				String status = result.getStreamDescription().getStreamStatus();
-				log.info("stream status: {}", status);
+				log.info("stream status: {}" + status);
 				if ("ACTIVE".equals(status)) {
 					streamAvailable = true;
-					log.info("stream {} is AVAILABLE", streamName);
+					log.info("stream {} is AVAILABLE" + streamName);
 					done = true;
 				}
 				if ("DELETING".equals(status)) {
@@ -150,7 +151,7 @@ public abstract class AbstractKinesisIntegrationTest {
 					done = true;
 				}
 				if ("CREATING".equals(status)) {
-					log.info("waiting for stream {} to become available...", getStreamName());
+					log.info("waiting for stream {} to become available..." + getStreamName());
 					try {
 						Thread.sleep(5000L);
 					} catch (Exception e) {
@@ -165,9 +166,9 @@ public abstract class AbstractKinesisIntegrationTest {
 			} while (!done);
 
 			if (streamAvailable) {
-				log.info("stream is avaialbale: {}", getStreamName());
+				log.info("stream is avaialbale: {}" + getStreamName());
 			} else {
-				log.info("stream is not available: {}", getStreamName());
+				log.info("stream is not available: {}" + getStreamName());
 				log.info("kinesis integration tests will be disabled");
 			}
 			kinesisAvailable = streamAvailable;
@@ -203,19 +204,19 @@ public abstract class AbstractKinesisIntegrationTest {
 				if (getStreamName().equals(it)) {
 					// ignore current stream
 				} else if (m.matches()) {
-					log.info("test stream: {}", it);
+					log.info("test stream: {}" + it);
 
 					long ageInMinutes = TimeUnit.MILLISECONDS
 							.toMinutes(Math.abs(System.currentTimeMillis() - Long.parseLong(m.group(1))));
 
-					log.info("stream is {} minutes old", ageInMinutes);
+					log.info("stream is {} minutes old" + ageInMinutes);
 					if (ageInMinutes > 30) {
-						log.info("deleting {}", it);
+						log.info("deleting {}" + it);
 						getKinesisClient().deleteStream(it);
 					}
 
 				} else {
-					log.info("not a test stream: {}", it);
+					log.info("not a test stream: {}" + it);
 				}
 
 			});

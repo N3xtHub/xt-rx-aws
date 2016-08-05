@@ -16,8 +16,9 @@ package com.xtrac.reactor.aws.sqs;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+
+import org.apache.commons.logging.LogFactory;
 
 import com.amazonaws.services.sqs.model.Message;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -25,7 +26,7 @@ import com.fasterxml.jackson.databind.node.MissingNode;
 
 public class SQSMessage {
 
-	static Logger logger = LoggerFactory.getLogger(SQSMessage.class);
+	final static Log log = LogFactory.getLog(SQSMessage.class);
 
 	SQSReactorBridge bridge;
 
@@ -62,7 +63,7 @@ public class SQSMessage {
 				jsonBody = SQSReactorBridge.mapper.readTree(getBodyAsString());
 				json.set(jsonBody);
 			} catch (IOException | RuntimeException e) {
-				logger.warn("problem parsing json body: " + e.toString());
+				log.warn("problem parsing json body: " + e.toString());
 				jsonBody = MissingNode.getInstance();
 				json.set(jsonBody);
 			}

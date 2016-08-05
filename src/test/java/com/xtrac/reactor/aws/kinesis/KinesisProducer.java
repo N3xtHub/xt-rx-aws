@@ -20,8 +20,9 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Properties;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+
+import org.apache.commons.logging.LogFactory;
 
 import com.amazonaws.ClientConfiguration;
 import com.amazonaws.regions.Region;
@@ -32,7 +33,7 @@ import com.xtrac.Config;
 
 public class KinesisProducer {
 
-	final static Logger log = LoggerFactory.getLogger(KinesisProducer.class);
+	final static Log log = LogFactory.getLog(KinesisProducer.class);
 
 	public static final void main(String[] args) throws Exception {
 

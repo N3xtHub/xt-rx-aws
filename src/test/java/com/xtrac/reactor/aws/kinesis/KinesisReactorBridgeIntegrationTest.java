@@ -48,7 +48,7 @@ public class KinesisReactorBridgeIntegrationTest extends AbstractKinesisIntegrat
 		Regions region = Regions.fromName(config.getRegionName());
 		
 		KinesisReactorBridge bridge = new KinesisReactorBridge.Builder().withRegion(region).withAppName("workflow")
-				.withEventBus(bus).withStreamName(getStreamName()).withAdditionalConfig(c -> {
+				.withEventBus(bus).withStreamName(config.getRegionName()).withAdditionalConfig(c -> {
 					c.withInitialPositionInStream(InitialPositionInStream.TRIM_HORIZON);
 				}).build().start();
 
@@ -64,7 +64,7 @@ public class KinesisReactorBridgeIntegrationTest extends AbstractKinesisIntegrat
 
 				String s = x.getData().getBodyAsString();
 
-				log.info("Received: {}", s);
+				log.info("Received: {}" + s);
 				if (s.equals(message)) {
 					latch.countDown();
 					eventRef.set(x);

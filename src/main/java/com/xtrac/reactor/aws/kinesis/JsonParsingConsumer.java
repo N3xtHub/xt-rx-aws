@@ -15,8 +15,9 @@ package com.xtrac.reactor.aws.kinesis;
 
 import java.io.IOException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+
+import org.apache.commons.logging.LogFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,7 +30,7 @@ import reactor.fn.Consumer;
 
 public class JsonParsingConsumer implements Consumer<Event<KinesisReactorBridge.KinesisRecord>> {
 
-	private static final Logger logger = LoggerFactory.getLogger(JsonParsingConsumer.class);
+	private final static Log log = LogFactory.getLog(JsonParsingConsumer.class);
 	private ObjectMapper mapper = new ObjectMapper();
 
 	@Override
@@ -42,10 +43,10 @@ public class JsonParsingConsumer implements Consumer<Event<KinesisReactorBridge.
 			EventUtil.copyEventHeaders(t, event);
 			record.getBridge().getEventBus().notify(n, event);
 		} catch (IOException | RuntimeException e) {
-			if (logger.isDebugEnabled()) {
-				logger.debug("could not parse json", e);
+			if (log.isDebugEnabled()) {
+				log.debug("could not parse json", e);
 			} else {
-				logger.warn("could not parse json: " + e.getMessage());
+				log.warn("could not parse json: " + e.getMessage());
 			}
 		}
 	}

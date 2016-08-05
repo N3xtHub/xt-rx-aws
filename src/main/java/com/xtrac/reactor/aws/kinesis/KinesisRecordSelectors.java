@@ -13,8 +13,9 @@
  */
 package com.xtrac.reactor.aws.kinesis;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+
+import org.apache.commons.logging.LogFactory;
 
 import com.xtrac.reactor.aws.kinesis.KinesisReactorBridge.KinesisRecord;
 
@@ -23,7 +24,7 @@ import reactor.bus.selector.Selectors;
 
 public class KinesisRecordSelectors {
 
-	private static final Logger logger = LoggerFactory.getLogger(KinesisRecordSelectors.class);
+	private final static Log log = LogFactory.getLog(KinesisRecordSelectors.class);
 
 	public static Selector anyKinesisRecord() {
 		return Selectors.type(KinesisRecord.class);

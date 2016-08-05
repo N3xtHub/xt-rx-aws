@@ -37,8 +37,9 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.xtrac.reactor.aws.AbstractReactorBridge;
 import com.xtrac.reactor.aws.sns.SNSAdapter;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+
+import org.apache.commons.logging.LogFactory;
 import reactor.bus.Event;
 import reactor.bus.EventBus;
 import reactor.bus.selector.Selector;
@@ -55,7 +56,7 @@ import java.util.regex.Pattern;
 
 public class SQSReactorBridge extends AbstractReactorBridge {
 
-	private final static Logger logger = LoggerFactory.getLogger(SQSReactorBridge.class);
+	private final static Log log = LogFactory.getLog(SQSReactorBridge.class);
 
 	private static ScheduledExecutorService globalExecutor = Executors.newScheduledThreadPool(1,
 			new ThreadFactoryBuilder().setDaemon(true).setNameFormat("SQSBridge-scheduler-%s").build());
@@ -74,8 +75,8 @@ public class SQSReactorBridge extends AbstractReactorBridge {
 	}
 
 	private void dispatch(Message m) {
-		if (logger.isDebugEnabled()) {
-			logger.debug("dispatching on {}: {}", eventBus, m);
+		if (log.isDebugEnabled()) {
+			log.debug("dispatching on {}: {}" + m);
 		}
 		SQSMessage sm = new SQSMessage(this, m);
 		Event<SQSMessage> em = Event.wrap(sm);
@@ -89,8 +90,8 @@ public class SQSReactorBridge extends AbstractReactorBridge {
 
 	protected void deleteMessageIfNecessary(Message m) {
 		if (isAutoDeleteEnabled()) {
-			if (logger.isDebugEnabled()) {
-				logger.debug("deleting message: {}", m.getReceiptHandle());
+			if (log.isDebugEnabled()) {
+				log.debug("deleting message: {}" + m.getReceiptHandle());
 			}
 			client.deleteMessageAsync(getQueueUrl(), m.getReceiptHandle());
 		}
@@ -320,7 +321,7 @@ public class SQSReactorBridge extends AbstractReactorBridge {
 			c.visibilityTimeout = visibilityTimeout;
 			c.arnSupplier = Suppliers.memoize(new SQSArnSupplier(c.client, c.urlSupplier));
 
-			logger.info("constructed {}. Don't forget to call start()", c);
+			log.info("constructed {}. Don't forget to call start()" + c);
 			return c;
 		}
 	}
@@ -342,7 +343,7 @@ public class SQSReactorBridge extends AbstractReactorBridge {
 
 			AtomicInteger chainCount = new AtomicInteger(0);
 			Throwables.getCausalChain(exception).forEach(it -> {
-				logger.warn("chain[{}]: {}", chainCount.getAndIncrement(), it.toString());
+				log.warn("chain[{}]: {}" + chainCount.getAndIncrement() + it.toString());
 			});
 		}
 
@@ -351,7 +352,7 @@ public class SQSReactorBridge extends AbstractReactorBridge {
 			try {
 				List<Message> list = result.getMessages();
 
-				logger.debug("received {} messages from {}", (list != null) ? list.size() : 0, getQueueUrl());
+				log.debug("received {} messages from {}" + getQueueUrl());
 				SQSReactorBridge.this.failureCount.set(0);
 
 				if (list == null || list.isEmpty()) {
@@ -362,7 +363,7 @@ public class SQSReactorBridge extends AbstractReactorBridge {
 					try {
 						dispatch(message);
 					} catch (Exception e) {
-						logger.error("could not dispatch event to reactor EventBus: {}", message);
+						log.error("could not dispatch event to reactor EventBus: {}"+ message);
 					}
 				}
 			} finally {
@@ -376,13 +377,13 @@ public class SQSReactorBridge extends AbstractReactorBridge {
 	}
 
 	public void stop() {
-		logger.info("stopping {}. Waiting for thread to die.", this);
+		log.info("stopping {}. Waiting for thread to die.");
 		running.set(false);
 		try {
 			daemonThread.join();
-			logger.info("stopped {}", this);
+			log.info("stopped {}");
 		} catch (InterruptedException e) {
-			logger.warn("", e);
+			log.warn("", e);
 		}
 	}
 
@@ -391,7 +392,7 @@ public class SQSReactorBridge extends AbstractReactorBridge {
 		if (oldValue) {
 			throw new IllegalStateException("already started");
 		}
-		logger.info("starting {}...", this);
+		log.info("starting {}...");
 
 		Runnable r = () -> {
 			while (isRunning()) {
@@ -405,13 +406,13 @@ public class SQSReactorBridge extends AbstractReactorBridge {
 					Future<ReceiveMessageResult> result = client.receiveMessageAsync(request, new Handler());
 					result.get(); // go ahead and block
 				} catch (Exception e) {
-					logger.warn("", e);
+					log.warn("", e);
 					failureCount.incrementAndGet();
 				}
 				try {
 					long rescheduleDelay = calculateRescheduleDelay();
 					if (rescheduleDelay > 0) {
-						logger.info("pausing for {}ms due to errors", rescheduleDelay);
+						log.info("pausing for {}ms due to errors" + rescheduleDelay);
 						Thread.sleep(rescheduleDelay);
 					}
 				} catch (InterruptedException e) {

@@ -15,8 +15,9 @@ package com.xtrac.reactor.aws.sns;
 
 import java.io.IOException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+
+import org.apache.commons.logging.LogFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,7 +25,7 @@ import com.fasterxml.jackson.databind.node.MissingNode;
 
 public class SNSMessage {
 
-	static Logger logger = LoggerFactory.getLogger(SNSMessage.class);
+	final static Log log = LogFactory.getLog(SNSMessage.class);
 
 	static ObjectMapper mapper = new ObjectMapper();
 
@@ -46,7 +47,7 @@ public class SNSMessage {
 			return jsonBody;
 		} catch (IOException e) {
 			jsonBody = MissingNode.getInstance();
-			logger.warn("problem parsing json: " + e.toString());
+			log.warn("problem parsing json: " + e.toString());
 		}
 		return jsonBody;
 	}

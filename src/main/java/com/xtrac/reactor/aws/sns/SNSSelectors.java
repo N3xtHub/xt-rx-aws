@@ -13,8 +13,9 @@
  */
 package com.xtrac.reactor.aws.sns;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+
+import org.apache.commons.logging.LogFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.xtrac.reactor.aws.util.MoreSelectors;
@@ -24,7 +25,7 @@ import reactor.bus.selector.Selectors;
 
 public class SNSSelectors {
 
-	static Logger logger = LoggerFactory.getLogger(SNSSelectors.class);
+	final static Log log = LogFactory.getLog(SNSSelectors.class);
 	static ObjectMapper mapper = new ObjectMapper();
 
 	public static Selector snsTopicSelector(String name) {
