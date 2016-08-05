@@ -115,7 +115,7 @@ public class SQSReactorBridgeTest {
 		String sqsName = result.getQueueUrl();
 		
 		SQSReactorBridge bridge = new SQSReactorBridge.Builder().withRegion(config.getRegionName()).withEventBus(bus)
-				.withUrl(config.getRegionName()).withClientConfiguration(clientConfiguration).build();
+				.withUrl(sqsName).withClientConfiguration(clientConfiguration).build();
 		Assertions.assertThat(bridge).isNotNull();
 		Assertions.assertThat(bridge.getFailureCount().get()).isEqualTo(0);
 		Assertions.assertThat(bridge.getEventBus()).isSameAs(bus);

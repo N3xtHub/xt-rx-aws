@@ -47,8 +47,8 @@ public class KinesisReactorBridgeIntegrationTest extends AbstractKinesisIntegrat
 		
 		Regions region = Regions.fromName(config.getRegionName());
 		
-		KinesisReactorBridge bridge = new KinesisReactorBridge.Builder().withRegion(region).withAppName("workflow")
-				.withEventBus(bus).withStreamName(config.getRegionName()).withAdditionalConfig(c -> {
+		KinesisReactorBridge bridge = new KinesisReactorBridge.Builder().withRegion(region).withAppName("workflow-runtime")
+				.withEventBus(bus).withStreamName(this.getStreamName()).withAdditionalConfig(c -> {
 					c.withInitialPositionInStream(InitialPositionInStream.TRIM_HORIZON);
 				}).build().start();
 
@@ -76,7 +76,7 @@ public class KinesisReactorBridgeIntegrationTest extends AbstractKinesisIntegrat
 		});
 
 		PutRecordResult xx = bridge.getKinesisClient().putRecord(getStreamName(), ByteBuffer.wrap(message.getBytes()),
-				"workflow");
+				"workflow-runtime");
 
 		boolean success = latch.await(2, TimeUnit.MINUTES);
 		Assertions.assertThat(success).isTrue();
@@ -96,7 +96,7 @@ public class KinesisReactorBridgeIntegrationTest extends AbstractKinesisIntegrat
 
 		Record r = kr.getRecord();
 		Assertions.assertThat(r.getSequenceNumber()).isNotNull();
-		Assertions.assertThat(r.getPartitionKey()).isEqualTo("workflow");
+		Assertions.assertThat(r.getPartitionKey()).isEqualTo("workflow-runtime");
 		Assertions.assertThat(r.getApproximateArrivalTimestamp()).isCloseTo(new Date(), 120000);
 
 		Thread.sleep(5000);
