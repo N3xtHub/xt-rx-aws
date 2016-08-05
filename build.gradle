@@ -99,9 +99,9 @@ bintray {
 		labels = ['rx-aws']
 		publicDownloadNumbers = true
 		version {
-			name = '${RX_AWS_VERSION}-Release'
+			name = '1.0.1-Release'
 			desc = 'Xtrac XT AWS 1.0 release'
-			vcsTag = '${RX_AWS_VERSION}'
+			vcsTag = '1.0.1'
 			attributes = ['gradle-plugin': 'com.use.less:com.use.less.gradle:gradle-useless-plugin']
 		}
 	}
