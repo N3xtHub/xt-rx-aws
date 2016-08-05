@@ -22,13 +22,13 @@ import java.util.concurrent.CountDownLatch;
 
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+
+import org.apache.commons.logging.LogFactory;
 
 import com.amazonaws.ClientConfiguration;
 import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
-import com.amazonaws.services.kinesis.AmazonKinesisClient;
 import com.amazonaws.services.sqs.AmazonSQSAsyncClient;
 import com.amazonaws.services.sqs.model.CreateQueueRequest;
 import com.amazonaws.services.sqs.model.CreateQueueResult;
@@ -45,7 +45,7 @@ import reactor.bus.selector.Selectors;
 
 public class SQSMessageTest {
 
-	static Logger log = LoggerFactory.getLogger(SQSMessageTest.class);
+	final static Log log = LogFactory.getLog(SQSMessageTest.class);
 
 	@Test
 	public void testIt() throws InterruptedException {
@@ -64,14 +64,12 @@ public class SQSMessageTest {
 		Config config = new Config(configProps);
 
 		ClientConfiguration clientConfiguration = new ClientConfiguration();
-		if (config.getProxyHost() != null && ! config.getProxyHost().equals("")) {
+		if (config.getProxyHost() != null && !config.getProxyHost().equals("")) {
 			clientConfiguration.setProxyHost(config.getProxyHost());
 			clientConfiguration.setProxyPort(config.getProxyPort());
-			 
+
 		}
-		
-		
-		
+
 		AmazonSQSAsyncClient client = new AmazonSQSAsyncClient(clientConfiguration);
 		Regions region = Regions.fromName(config.getRegionName());
 
@@ -79,15 +77,15 @@ public class SQSMessageTest {
 		CreateQueueRequest request = new CreateQueueRequest("test");
 		CreateQueueResult result = client.createQueue(request);
 		String sqsName = result.getQueueUrl();
-		
+
 		EventBus b = EventBus.create(Environment.initializeIfEmpty());
 		SQSReactorBridge bridge = null;
-		try{
-			
-			bridge = new SQSReactorBridge.Builder().withRegion(config.getRegionName())
-				.withUrl(sqsName).withEventBus(b).withClientConfiguration(clientConfiguration).build();
-		
-		} catch(Exception e) {
+		try {
+
+			bridge = new SQSReactorBridge.Builder().withRegion(config.getRegionName()).withUrl(sqsName).withEventBus(b)
+					.withClientConfiguration(clientConfiguration).build();
+
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		SQSMessage msg = new SQSMessage(bridge, m);
