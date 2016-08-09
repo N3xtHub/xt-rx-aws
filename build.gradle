@@ -97,7 +97,6 @@ bintray {
 		licenses = ['Apache-2.0']
 		vcsUrl = 'https://github.com/xtraclabs/xt-rx-aws.git'
 		labels = ['rx-aws']
-		released  = new Date()
 		publicDownloadNumbers = true
 		version {
 			name = 'Xtrac XT RX AWS'
