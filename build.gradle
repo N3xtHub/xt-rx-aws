@@ -100,9 +100,9 @@ bintray {
 		released  = new Date()
 		publicDownloadNumbers = true
 		version {
-			name = $version
-			desc = 'Xtrac XT RX AWS release'
-			vcsTag = $version
+			name = 'Xtrac XT RX AWS'
+			desc = 'Xtrac XT RX AWS'
+			vcsTag = '1.0.1'
 			attributes = ['gradle-plugin': 'com.use.less:com.use.less.gradle:gradle-useless-plugin']
 		}
 	}
