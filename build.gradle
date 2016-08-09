@@ -81,7 +81,7 @@ publishing {
 			from components.java
 			groupId 'com.xtrac'
             		artifactId 'com.xtrac.xt-rx-aws'
-            		version $version
+            		version ${RX_AWS_VERSION}
 		}
 	}
 }
@@ -101,7 +101,7 @@ bintray {
 		version {
 			name = 'Xtrac XT RX AWS'
 			desc = 'Xtrac XT RX AWS'
-			vcsTag = '1.0.1'
+			vcsTag = ${RX_AWS_VERSION}
 			attributes = ['gradle-plugin': 'com.use.less:com.use.less.gradle:gradle-useless-plugin']
 		}
 	}
