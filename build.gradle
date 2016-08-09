@@ -97,12 +97,13 @@ bintray {
 		licenses = ['Apache-2.0']
 		vcsUrl = 'https://github.com/xtraclabs/xt-rx-aws.git'
 		labels = ['rx-aws']
+		released  = new Date()
 		publicDownloadNumbers = true
 		version {
-			name = '1.0.1-Release'
-			desc = 'Xtrac XT AWS 1.0 release'
-			vcsTag = '1.0.1'
-			attributes = ['gradle-plugin': 'com.use.less:com.use.less.gradle:gradle-useless-plugin']
+			name = '${RX_AWS_VERSION}-Release'
+			desc = 'Xtrac XT AWS ${RX_AWS_VERSION} release'
+			vcsTag = '${RX_AWS_VERSION}'
+			//attributes = ['gradle-plugin': 'com.use.less:com.use.less.gradle:gradle-useless-plugin']
 		}
 	}
 }
